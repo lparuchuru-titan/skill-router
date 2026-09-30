@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+hooks/route-hint.log.jsonl
+*.log

@@ -1,0 +1,18 @@
+{"id":"t01","type":"in","query":"Write a Jest unit test for the parser","expected":["write-unit-tests"]}
+{"id":"t02","type":"in","query":"The pytest suite has a failing assertion","expected":["write-unit-tests"]}
+{"id":"t03","type":"in","query":"Please review this pull request for security issues","expected":["review-pull-request"]}
+{"id":"t04","type":"in","query":"Look at the diff before we merge","expected":["review-pull-request"]}
+{"id":"t05","type":"in","query":"Explain how the billing module works for a new hire","expected":["explain-code"]}
+{"id":"t06","type":"in","query":"Walk me through the checkout flow","expected":["explain-code"]}
+{"id":"t07","type":"in","query":"Rewrite the project README for new contributors","expected":["draft-docs"]}
+{"id":"t08","type":"in","query":"We need setup documentation in the README","expected":["draft-docs"]}
+{"id":"t09","type":"in","query":"Run a SQL query to list open orders","expected":["query-data"]}
+{"id":"t10","type":"in","query":"Write a SOQL select for accounts created this week","expected":["query-data"]}
+{"id":"t11","type":"in","query":"Prepare the release checklist and bump the version","expected":["ship-release"]}
+{"id":"t12","type":"in","query":"Draft the changelog for the release","expected":["ship-release"]}
+{"id":"t13","type":"in","query":"Which HTTP status code should a missing resource return","expected":["http-api-guide"]}
+{"id":"t14","type":"in","query":"How should pagination work on this REST API","expected":["http-api-guide"]}
+{"id":"n01","type":"out","query":"What is a good lasagna recipe","expected":[]}
+{"id":"n02","type":"out","query":"Recommend a laptop for video editing","expected":[]}
+{"id":"n03","type":"out","query":"What is the weather in Austin tomorrow","expected":[]}
+{"id":"n04","type":"out","query":"Book a flight to Denver next Friday","expected":[]}

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "skill-router": {
+      "command": "node",
+      "args": ["mcp/server.mjs"],
+      "env": {
+        "SKILL_ROUTER_ROOT": "."
+      }
+    }
+  }
+}

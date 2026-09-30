@@ -1,0 +1,184 @@
+{
+  "generated": "2026-09-30T20:55:38.179Z",
+  "skillsDir": "skills",
+  "count": 7,
+  "intents": [
+    {
+      "id": "ship-a-release",
+      "skill": "ship-release",
+      "also": [
+        "draft-docs"
+      ],
+      "why": "A release note is documentation. Load the docs skill in the same turn."
+    },
+    {
+      "id": "review-a-change",
+      "skill": "review-pull-request",
+      "also": [
+        "write-unit-tests"
+      ],
+      "why": "A review that finds a gap should be able to ask for a test in the same turn."
+    },
+    {
+      "id": "query-before-you-edit",
+      "skill": "query-data",
+      "also": [],
+      "why": "Read-only queries stay on the query skill."
+    }
+  ],
+  "skills": [
+    {
+      "dir": "draft-docs",
+      "name": "draft-docs",
+      "description": "Rewrite a project README or setup documentation for new contributors.",
+      "oneLine": "Rewrite a project README or setup documentation for new contributors.",
+      "keywords": [
+        "readme",
+        "documentation",
+        "setup",
+        "contributors",
+        "draft-docs",
+        "rewrite",
+        "project",
+        "new"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/draft-docs/SKILL.md"
+    },
+    {
+      "dir": "explain-code",
+      "name": "explain-code",
+      "description": "Explain a module or flow for a new hire. Use when someone says explain, walk me through, or how does this work.",
+      "oneLine": "Explain a module or flow for a new hire. Use when someone says explain, walk me through, or how does this work.",
+      "keywords": [
+        "explain",
+        "walkthrough",
+        "onboarding",
+        "checkout",
+        "billing",
+        "explain-code",
+        "module",
+        "flow",
+        "new",
+        "hire",
+        "someone",
+        "says",
+        "walk",
+        "through",
+        "work"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/explain-code/SKILL.md"
+    },
+    {
+      "dir": "http-api-guide",
+      "name": "http-api-guide",
+      "description": "Curated reference for HTTP and REST API design, including status codes, pagination, and idempotency.",
+      "oneLine": "Curated reference for HTTP and REST API design, including status codes, pagination, and idempotency.",
+      "keywords": [
+        "http",
+        "rest",
+        "status code",
+        "pagination",
+        "idempotency",
+        "http-api-guide",
+        "curated",
+        "reference",
+        "api",
+        "design",
+        "including",
+        "status",
+        "codes"
+      ],
+      "hasKnowledge": true,
+      "path": "skills/http-api-guide/SKILL.md"
+    },
+    {
+      "dir": "query-data",
+      "name": "query-data",
+      "description": "Author and run a read-only database query. Use for SQL, SOQL, or a SELECT against orders or accounts.",
+      "oneLine": "Author and run a read-only database query. Use for SQL, SOQL, or a SELECT against orders or accounts.",
+      "keywords": [
+        "sql",
+        "soql",
+        "select",
+        "query",
+        "orders",
+        "accounts",
+        "query-data",
+        "author",
+        "read-only",
+        "database",
+        "against"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/query-data/SKILL.md"
+    },
+    {
+      "dir": "review-pull-request",
+      "name": "review-pull-request",
+      "description": "Review a diff or pull request for correctness, security issues, and regressions before merge.",
+      "oneLine": "Review a diff or pull request for correctness, security issues, and regressions before merge.",
+      "keywords": [
+        "pull request",
+        "diff",
+        "code review",
+        "security",
+        "merge",
+        "review-pull-request",
+        "review",
+        "pull",
+        "request",
+        "correctness",
+        "issues",
+        "regressions",
+        "before"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/review-pull-request/SKILL.md"
+    },
+    {
+      "dir": "ship-release",
+      "name": "ship-release",
+      "description": "Prepare a release: version bump, changelog, and a deploy checklist.",
+      "oneLine": "Prepare a release: version bump, changelog, and a deploy checklist.",
+      "keywords": [
+        "release",
+        "changelog",
+        "version bump",
+        "deploy checklist",
+        "ship-release",
+        "prepare",
+        "version",
+        "bump",
+        "deploy",
+        "checklist"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/ship-release/SKILL.md"
+    },
+    {
+      "dir": "write-unit-tests",
+      "name": "write-unit-tests",
+      "description": "Write or fix unit tests. Use for Jest, pytest, a failing assertion, coverage, or a test-data factory.",
+      "oneLine": "Write or fix unit tests. Use for Jest, pytest, a failing assertion, coverage, or a test-data factory.",
+      "keywords": [
+        "jest",
+        "pytest",
+        "unit test",
+        "assertion",
+        "coverage",
+        "write-unit-tests",
+        "write",
+        "fix",
+        "unit",
+        "tests",
+        "failing",
+        "test-data",
+        "factory"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/write-unit-tests/SKILL.md"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "note": "Companion map only. Ranking is BM25 over skill frontmatter. These rules do not vote. `also` is attached after a skill wins.",
+  "rules": [
+    {
+      "id": "ship-a-release",
+      "skill": "ship-release",
+      "also": ["draft-docs"],
+      "why": "A release note is documentation. Load the docs skill in the same turn."
+    },
+    {
+      "id": "review-a-change",
+      "skill": "review-pull-request",
+      "also": ["write-unit-tests"],
+      "why": "A review that finds a gap should be able to ask for a test in the same turn."
+    },
+    {
+      "id": "query-before-you-edit",
+      "skill": "query-data",
+      "also": [],
+      "why": "Read-only queries stay on the query skill."
+    }
+  ]
+}

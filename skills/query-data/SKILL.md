@@ -1,0 +1,13 @@
+---
+name: query-data
+description: Author and run a read-only database query. Use for SQL, SOQL, or a SELECT against orders or accounts.
+keywords: sql, soql, select, query, orders, accounts
+---
+
+# Query data
+
+Load this skill for a read-only query.
+
+1. Name the object, the filter, and the columns you actually need.
+2. Keep the query selective. Do not select every column to answer a count.
+3. Do not pair this skill with a write or a deploy.

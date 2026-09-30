@@ -1,0 +1,21 @@
+{
+  "name": "skill-router",
+  "version": "1.0.0",
+  "description": "Zero-dependency router that picks the right agent skill from a catalog. BM25 over SKILL.md frontmatter, an MCP server, and a gold-set eval.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "skill-router": "mcp/server.mjs"
+  },
+  "scripts": {
+    "generate": "node scripts/generate-index.mjs",
+    "eval": "node eval/run-eval.mjs",
+    "eval:gate": "node eval/run-eval.mjs --gate 90"
+  },
+  "devDependencies": {
+    "docx": "^9.5.1"
+  }
+}
