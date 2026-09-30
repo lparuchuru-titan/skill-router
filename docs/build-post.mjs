@@ -13,6 +13,7 @@ import {
   Footer,
   Header,
   HeadingLevel,
+  ImageRun,
   LevelFormat,
   Packer,
   PageNumber,
@@ -93,9 +94,9 @@ function bullet(text) {
   });
 }
 
-function step(text) {
+function step(text, instance = 0) {
   return new Paragraph({
-    numbering: { reference: "post-steps", level: 0 },
+    numbering: { reference: "post-steps", level: 0, instance },
     spacing: { before: 40, after: 60, line: 276 },
     children: [run(text)],
   });
@@ -134,6 +135,30 @@ function callout(text) {
 
 function spacer() {
   return new Paragraph({ spacing: { before: 0, after: 120 }, children: [] });
+}
+
+const diagramsDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "diagrams");
+
+function figure(file, alt, width, height, caption) {
+  return [
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 140, after: 60 },
+      children: [
+        new ImageRun({
+          type: "png",
+          data: fs.readFileSync(path.join(diagramsDir, file)),
+          transformation: { width, height },
+          altText: { title: alt, description: alt, name: file.replace(".png", "") },
+        }),
+      ],
+    }),
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 0, after: 160 },
+      children: [run(caption, { size: 18, italics: true, color: MUTED })],
+    }),
+  ];
 }
 
 function code(lines) {
@@ -289,7 +314,7 @@ const doc = new Document({
         children: [run("Load the right skill first", { size: 48, bold: true, color: NAVY })],
       }),
       para([
-        run("A measured router for agent skill catalogs, and why it stayed lexical.", { size: 24, italics: true, color: MUTED }),
+        run("Everyone has a skill library now. The part that matters is which skill a prompt actually loads.", { size: 24, italics: true, color: MUTED }),
       ], { after: 80 }),
       para([
         run("Lakshmikanth Paruchuru", { size: 20, bold: true, color: NAVY }),
@@ -302,15 +327,89 @@ const doc = new Document({
           ["Suggested slug", "load-the-right-skill-first"],
           ["Tags", "AI agents, MCP, BM25, developer tools, Claude, Cursor"],
           ["Code", "github.com/lparuchuru-titan/skill-router"],
-          ["Length", "About 1,800 words"],
+          ["Length", "About 2,200 words"],
         ],
         [2200, 7880],
       ),
       spacer(),
 
-      body("A coding agent with ninety skills does not fail because it lacks instructions. It fails because it loads the wrong ones, or loads none, and then improvises. I hit that wall while maintaining a Salesforce delivery kit large enough that the skill list itself became the problem. The router in this post is the general version of the fix. It does not know Salesforce. It knows how to pick one skill, name anything that should load beside it, and stay quiet when the prompt is not a skill at all."),
-      callout("Empty is a successful answer. A router that always picks something will eventually enforce the wrong playbook with complete confidence."),
+      body("A year ago, a skill library was a novelty. Now it is the default. Teams publish folders of SKILL.md files for Claude, Cursor, and every other coding agent that will read them. Salesforce teams have been early and loud about it: one skill to write Apex, another to run tests, another to deploy, another to grant field access, another to scan the diff. The library grows every week. The agent does not get better at the same rate."),
+      body("The miss is not the missing skill. The miss is the prompt. A person types “add a formula field and make sure the existing permission set can see it,” and the agent either loads nothing and improvises, or loads the nearest skill and follows the wrong procedure. Ninety good playbooks in a folder do not help if the turn loads zero of them, or loads the one that creates a new permission set when the task was to edit the set you already have."),
+      callout("A skill library answers “what do we know how to do?” The skill router answers “which of those does this prompt need, and which should stay on disk?”"),
       spacer(),
+      body("That second question is the whole product. I built the router while maintaining a Salesforce delivery kit of about ninety skills. The same mechanism works for any catalog. It reads the prompt, scores it against skill names and descriptions, and returns the one skill to load. If nothing clears a floor, it returns an empty list. Empty is a successful answer. A router that always picks something will eventually enforce the wrong playbook with complete confidence."),
+
+      h1("A slice of a Salesforce skill library"),
+      body("Here is a small cut of the kind of library people are already installing. These are ordinary Salesforce platform skills. Each one owns a narrow job. The descriptions are the routing signal: the words a person actually types."),
+      spacer(),
+      table(
+        ["Skill", "The prompt it should win"],
+        [
+          ["platform-soql-query", "Write or check a SOQL or SOSL query."],
+          ["platform-apex-generate", "Write or refactor an Apex class or trigger."],
+          ["platform-apex-test-generate", "Generate an Apex test, including a bulk case."],
+          ["platform-apex-test-run", "Run tests and read the coverage."],
+          ["platform-apex-logs-debug", "Read a debug log or a governor-limit failure."],
+          ["platform-metadata-retrieve", "Pull metadata from an org into the project."],
+          ["platform-metadata-deploy", "Deploy metadata with the Salesforce CLI."],
+          ["platform-custom-field-generate", "Create a custom field, including a formula."],
+          ["platform-permission-set-generate", "Grant object and field access in a permission set."],
+          ["platform-validation-rule-generate", "Author a validation rule."],
+          ["automation-flow-generate", "Build a screen, record-triggered, or autolaunched flow."],
+          ["dx-code-analyzer-run", "Scan Apex or LWC for security and performance issues."],
+        ],
+        [4200, 5880],
+      ),
+      spacer(),
+      body("Twelve skills is already enough to collide. “Test” appears in three of them. “Field” appears in two. “Deploy” is a neighbor of “retrieve.” A keyword scan that stops at the first hit will send a coverage question to the skill that generates tests, and a retrieve question to the skill that deploys. The person did not ask for a bigger library. They asked for the prompt to land on the right row."),
+      body("Watch one prompt move through the router."),
+      bullet("“Write a SOQL query for accounts created this week.” Rare tokens: SOQL, query, accounts. Winner: platform-soql-query. The deploy skill and the Apex skill stay unloaded."),
+      bullet("“Run the failing test class and tell me the coverage.” Rare tokens: test, run, coverage. Winner: platform-apex-test-run, not the skill that writes a new test."),
+      bullet("“Add a formula field for renewal date.” Winner: platform-custom-field-generate. If the same turn also says “grant access on the existing permission set,” the router can name platform-permission-set-generate as a companion. The companion is loaded with the winner. It does not steal the win."),
+      bullet("“What is a good lasagna recipe.” No skill clears the floor. The router returns nothing, and the agent does not invent a Salesforce procedure for dinner."),
+      body("That is the help. The library can hold dozens or hundreds of skills. The prompt pays for one of them. Context stays small, the guardrails in that skill actually run, and a prompt that is not yours does not get a random playbook stapled to it."),
+      ...figure(
+        "01-route.png",
+        "A prompt goes to the skill router, which either loads one skill or abstains.",
+        620,
+        302,
+        "Figure 1. A confident match loads one skill. Anything under the floor loads nothing.",
+      ),
+
+      h1("How the router helps"),
+      body("Without a router, a host matches the prompt against every skill description it was given, or it matches against none and relies on the model’s memory. Both degrade as the library grows. Descriptions start to share words. The context window fills with procedures the turn will not use. The model picks a plausible skill and follows it carefully, which is worse than picking none, because the mistake is now enforced."),
+      body("The router sits in front of that, as a tool the agent can call or as a one-line hint before the turn starts. It does five jobs."),
+      ...figure(
+        "02-library.png",
+        "Eight skills stay on disk. One skill is loaded into the turn.",
+        620,
+        333,
+        "Figure 2. The catalog can be large. The turn receives the winner only.",
+      ),
+      step("It names the owning skill before any code, metadata, or query is written. The agent then reads that SKILL.md and follows it.", 1),
+      step("It keeps the rest of the library on disk. find_skill returns a ranked hit, not the catalog. list_skills and read_skill exist so the agent can open exactly what was named.", 1),
+      step("It prefers the distinctive word. BM25 scores a term that lives in one skill much higher than a term that lives in twenty. “Coverage” pulls the test-runner. “SOQL” pulls the query skill. “Formula field” pulls field generation.", 1),
+      step("It abstains. Below a floor, the result is an empty list. The agent is free to answer directly. It is not free to pretend a skill applied.", 1),
+      step("It names companions after the winner is chosen. A field change that also needs access can load the permission-set skill in the same turn. The companion list never reorders the ranking.", 1),
+      spacer(),
+      body("The same index is available three ways, because hosts differ. ROUTER.md is the human table. An MCP server exposes find_skill, list_skills, read_skill, search_topics, and read_topic over stdin, with no packages to install. An optional hook prints “load this skill first” only when it is sure, and prints nothing otherwise."),
+
+      h1("Extending the library does not mean extending the router"),
+      body("This is the part teams underestimate. Adding skill number ninety-one should be a file, not a project. The ranker does not get a new branch. You do not retrain a model. You do not edit a priority list of phrases and hope you inserted the rule in the right place."),
+      ...figure(
+        "03-extend.png",
+        "Four steps: write the skill, rebuild the index, prove the route, then use it.",
+        620,
+        202,
+        "Figure 3. Extending the library is a file and an eval run. The router code stays put.",
+      ),
+      step("Create skills/<name>/SKILL.md. Put the words a person would actually type into the description. That sentence is the routing signal. The body is the procedure, and it is loaded only after the skill wins.", 2),
+      step("If another skill should come along for the ride, add one line to the companion map. That line is attached after a winner is chosen. It does not vote.", 2),
+      step("Add a gold prompt that must hit this skill, and a negative if the new words could false-fire on an unrelated prompt.", 2),
+      step("Regenerate the index and run the eval. If Recall@1 drops or a negative starts firing, the description is overlapping a neighbor, or the floor needs a sweep. Fix that before the next skill.", 2),
+      spacer(),
+      body("The router code stays put. The index is generated. A new Salesforce skill — a naming-convention check, a permission-set diff, a flow-fault reviewer — shows up in find_skill on the next prompt, because its description is now in the catalog. Removing a skill is the same operation in reverse: delete the folder, regenerate, confirm the gold prompts that used to hit it now abstain or land on the replacement."),
+      body("Efficiency here is operational, not clever. The expensive work is writing a sharp description and one prompt that proves it. The cheap work is everything the router does after that. I have added skills to a live catalog this way in minutes. The sessions that went wrong were the ones where I tuned a description by reading it, skipped the gold prompt, and discovered a week later that it had stolen a neighbor’s traffic."),
 
       h1("The failure mode"),
       body("A skill, in the sense this router cares about, is a markdown file. The frontmatter carries a name and a description. The body carries the procedure: what to read, what to refuse, what “done” means. Hosts such as Claude Code and Cursor already match a prompt against those descriptions. That match is enough while the catalog is small."),
@@ -326,11 +425,8 @@ const doc = new Document({
       body("The body of the skill is not in the index. That choice came from a measurement, which is in the bake-off below. The procedure is loaded later, on purpose, by a separate tool, after the route has already been decided."),
       body("If a skill ships a folder of curated notes rather than a single procedure, the generator also rebuilds a topic index for that folder. Routing still picks the skill. A second, simpler search picks the note."),
 
-      h1("Three ways to ask"),
-      body("The same index is exposed three ways, because different hosts will reach for different ones."),
-      step("The markdown table. Point the agent at ROUTER.md if you want it to read the map itself."),
-      step("An MCP server. Five tools, newline-delimited JSON-RPC on stdin, no packages to install."),
-      step("An optional hook. It runs when a prompt arrives and, only when it is sure, injects one line: load this skill first."),
+      h1("The tools"),
+      body("find_skill is the call that matters. The other four exist so the agent can open exactly the skill or note that won, instead of guessing a path."),
       spacer(),
       table(
         ["Tool", "Returns"],
@@ -344,7 +440,6 @@ const doc = new Document({
         [2400, 7680],
       ),
       spacer(),
-      body("find_skill is the tool that matters. The others exist so the agent can load what the router named, instead of guessing a path."),
 
       h1("How a prompt is scored"),
       body("The scorer is BM25, the ranking function behind a lot of ordinary search. There is no embedding model, no vector database, and no runtime dependency. Node 18 and the standard library are the whole stack."),
@@ -423,13 +518,7 @@ const doc = new Document({
         "node eval/run-eval.mjs --gate 90",
       ]),
       spacer(),
-      body("Adding a skill is four steps."),
-      step("Create skills/<name>/SKILL.md. Put the words a person would actually type into the description. That sentence is the routing signal."),
-      step("If another skill should come along, add it under also in router/intents.json. That entry is attached after a winner is chosen."),
-      step("Add a gold prompt that must hit, and a negative if the new words could false-fire."),
-      step("Regenerate the index and run the eval. If Recall@1 drops or a negative fires, fix the description or sweep the floor before you add the next skill."),
-      spacer(),
-      body("Set SKILL_ROUTER_ROOT if the checkout is not the working directory, and SKILL_ROUTER_SKILLS_DIR if the skills live somewhere else, such as a user-level skills folder. Set SKILL_ROUTER_FLOOR when you retune."),
+      body("Those two commands are the entire extension loop: regenerate the index, then prove the new skill did not steal a neighbor. Set SKILL_ROUTER_ROOT if the checkout is not the working directory, and SKILL_ROUTER_SKILLS_DIR if the skills live somewhere else, such as a user-level skills folder. Set SKILL_ROUTER_FLOOR when you retune."),
 
       h1("What I would leave out"),
       body("I would leave out a vector index aimed at the last bit of paraphrase recall. The bake-off says the gain is not there, and the cost is a model, a dependency, and worse abstain behavior once you fuse the two scores."),
@@ -437,7 +526,7 @@ const doc = new Document({
       body("I would leave the skill body out of the index. More text at route time felt like more context. It was more ways to tie."),
 
       h1("The boring version is the one that works"),
-      body("The useful shape of this system is small. A generated index. A lexical ranker. A floor you retune when the catalog changes. A gold set that fails the build when routing gets worse. A rule that an empty result is a valid result. The agent loads one skill and does the task that skill describes. When the prompt is not one of yours, the router gets out of the way."),
+      body("Skill libraries are everywhere now. The useful next step is small. A generated index. A ranker that sends the prompt to one skill. A floor you retune when the catalog changes. A gold set that fails the build when a new skill steals a neighbor. The agent loads that skill and does the task it describes. The other eighty-nine stay on disk. When the prompt is not one of yours, the router gets out of the way."),
       spacer(),
       para([
         run("Lakshmikanth Paruchuru", { bold: true, color: NAVY }),
