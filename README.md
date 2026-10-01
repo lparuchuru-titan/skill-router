@@ -40,7 +40,9 @@ printf '%s\n' \
   | node mcp/server.mjs
 ```
 
-You want a hit on `write-unit-tests`. A prompt like "what is a good lasagna recipe" should come back as `[]`.
+In the reply, look for `"skill": "write-unit-tests"`. A prompt like "what is a good lasagna recipe" should come back as `[]`.
+
+A prompt with two jobs should name both skills. Try `Add a formula field for renewal date and grant field-level security on the sales permission set`. The list should include `platform-custom-field-generate` and `platform-permission-set-generate`.
 
 Check the whole gold set:
 
@@ -139,12 +141,14 @@ If the exact set drops under 80 percent, or a negative prompt returns a skill, t
 
 To point the router at skills you already have, pass that folder. For the Salesforce skills library, clone it and pass its `skills` directory:
 
+Run this from the skill-router folder. It clones the Salesforce library next to the router and rewrites the local index. The sample files in `skills/` stay where they are.
+
 ```bash
 git clone https://github.com/forcedotcom/sf-skills.git
-node scripts/generate-index.mjs --skills-dir /path/to/sf-skills/skills --out-dir .
+node scripts/generate-index.mjs --skills-dir sf-skills/skills --out-dir .
 ```
 
-A folder of skills you wrote is the same command with your path. Then set `SKILL_ROUTER_SKILLS_DIR` to that same folder when you start the server. Those files need a name and a description. Add a `keywords` line, comma-separated job phrases, on any skill a prompt should load beside another. Without that line, a prompt still loads the single best match. Retune `SKILL_ROUTER_FLOOR` with the eval. A floor that worked on this sample catalog will be wrong for a much larger one.
+A folder of skills you wrote is the same command with your path. If the clone is somewhere else, pass that path instead of `sf-skills/skills`. Then set `SKILL_ROUTER_SKILLS_DIR` to that same folder when you start the server. Those files need a name and a description. Add a `keywords` line, comma-separated job phrases, on any skill a prompt should load beside another. Without that line, a prompt still loads the single best match. Retune `SKILL_ROUTER_FLOOR` with the eval. A floor that worked on this sample catalog will be wrong for a much larger one.
 
 ## Optional: hint before the turn starts
 
@@ -191,11 +195,11 @@ The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `
 | Name and one-line description. This is what ships. | 84% (63/75) | 84% (63/75) | 0/10 |
 | Name, description, and the whole skill file. | 84% (63/75) | 84% (63/75) | 3/10 |
 
-Every prompt that uses the skill’s own words hits, including all 5 prompts that ask for two skills. Every paraphrase misses, because those prompts avoid the skill’s vocabulary. Counting shared words puts the right skill first just as often here, and then returns neighboring skills the prompt did not ask for. Searching the whole skill file starts answering prompts that should get nothing. There is no embedding scorer in this repo.
+Every prompt that uses the skill’s own words hits, including all 5 prompts that ask for two skills. Of the 12 prompts worded differently, 4 return nothing and 8 return a different skill. They avoid the skill’s vocabulary. Counting shared words puts the right skill first just as often here, and then returns neighboring skills the prompt did not ask for. Searching the whole skill file starts answering prompts that should get nothing. There is no embedding scorer in this repo.
 
 ## Blog post
 
-`docs/Load-the-Right-Skill-First.docx` is the external write-up: why a skill library is not enough, a Salesforce skill slice, and how one prompt loads one skill or several.
+`docs/Load-the-Right-Skill-First.docx` is the external write-up. The skills in the repo are samples. The post is about how a prompt loads one skill or several, including from skills you wrote or from forcedotcom/sf-skills.
 
 ## License
 

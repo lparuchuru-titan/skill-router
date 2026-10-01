@@ -86,8 +86,8 @@ def route_diagram():
 
     prompt = (48, 170, 460, 460)
     router = (560, 170, 1000, 460)
-    win = (1100, 140, 1552, 400)
-    quiet = (1100, 470, 1552, 720)
+    win = (1160, 140, 1552, 400)
+    quiet = (1160, 470, 1552, 720)
 
     rounded(draw, prompt, WHITE, NAVY)
     rounded(draw, router, CREAM, GOLD)
@@ -100,11 +100,11 @@ def route_diagram():
     text_block(draw, quiet, "Or abstain", "Lasagna recipes, laptop shopping. Return an empty list.", title_fill=MUTED, body_fill=MUTED)
 
     arrow(draw, 460, 315, 548, 315)
-    arrow(draw, 1000, 250, 1088, 250)
-    arrow(draw, 1000, 390, 1088, 560)
+    arrow(draw, 1000, 250, 1148, 250)
+    arrow(draw, 1000, 390, 1148, 560)
     draw.text((478, 260), "compare", font=font(18, True), fill=GOLD)
-    draw.text((1006, 208), "both jobs", font=font(18, True), fill=GREEN)
-    draw.text((1004, 430), "weak match", font=font(18, True), fill=MUTED)
+    draw.text((1008, 214), "both jobs", font=font(18, True), fill=GREEN)
+    draw.text((1008, 470), "weak match", font=font(18, True), fill=MUTED)
     image.save(OUT / "01-route.png", "PNG")
 
 
@@ -154,10 +154,10 @@ def extend_diagram():
     draw.text((48, 84), "The router code does not change.", font=font(22), fill=MUTED)
 
     steps = [
-        ("1", "Write the skill", "skills/<name>/SKILL.md. The description uses the words people type."),
+        ("1", "Write the skill", "skills/<name>/SKILL.md. Put the job phrase in keywords."),
         ("2", "Rebuild the index", "node scripts/generate-index.mjs"),
         ("3", "Prove the route", "Add a gold prompt. Run the eval. Fix overlaps before the next skill."),
-        ("4", "Use it", "The next matching prompt loads the new skill. Nothing else was retrained."),
+        ("4", "Use it", "The next matching prompt loads the new skill. The router code stays the same."),
     ]
     x = 40
     box_w = 340
