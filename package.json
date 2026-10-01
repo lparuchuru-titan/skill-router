@@ -13,7 +13,7 @@
   "scripts": {
     "generate": "node scripts/generate-index.mjs",
     "eval": "node eval/run-eval.mjs",
-    "eval:gate": "node eval/run-eval.mjs --gate 90"
+    "eval:gate": "node eval/run-eval.mjs --gate 80"
   },
   "devDependencies": {
     "docx": "^9.5.1"

@@ -1,24 +1,139 @@
 {
   "version": 1,
-  "note": "Companion map only. Ranking is BM25 over skill frontmatter. These rules do not vote. `also` is attached after a skill wins.",
+  "note": "Production ranking ignores `when`. BM25 scores skill frontmatter. `also` is attached after a skill wins. `when` exists so eval/compare.mjs can measure an intent-list scorer against the same prompts. Earlier rules win ties in that scorer, so specific phrases come first.",
   "rules": [
     {
-      "id": "ship-a-release",
-      "skill": "ship-release",
-      "also": ["draft-docs"],
-      "why": "A release note is documentation. Load the docs skill in the same turn."
+      "id": "apex-test-run",
+      "skill": "platform-apex-test-run",
+      "when": ["code coverage", "run apex test", "failing test class"],
+      "also": [],
+      "why": "Running tests is not the same skill as writing them."
+    },
+    {
+      "id": "apex-test-generate",
+      "skill": "platform-apex-test-generate",
+      "when": ["apex test class", "apex test", "bulk test"],
+      "also": [],
+      "why": "A new Apex test class."
+    },
+    {
+      "id": "apex-logs",
+      "skill": "platform-apex-logs-debug",
+      "when": ["debug log", "governor limit", "cpu time"],
+      "also": [],
+      "why": "A log or a limit failure."
+    },
+    {
+      "id": "apex-generate",
+      "skill": "platform-apex-generate",
+      "when": ["apex class", "apex trigger", "refactor apex"],
+      "also": [],
+      "why": "Production Apex, not tests."
+    },
+    {
+      "id": "soql",
+      "skill": "platform-soql-query",
+      "when": ["soql", "sosl"],
+      "also": [],
+      "why": "A Salesforce query."
+    },
+    {
+      "id": "retrieve",
+      "skill": "platform-metadata-retrieve",
+      "when": ["sf project retrieve", "retrieve metadata"],
+      "also": [],
+      "why": "Pull metadata from an org."
+    },
+    {
+      "id": "deploy",
+      "skill": "platform-metadata-deploy",
+      "when": ["sf project deploy", "deploy metadata"],
+      "also": [],
+      "why": "Push metadata to an org."
+    },
+    {
+      "id": "custom-field",
+      "skill": "platform-custom-field-generate",
+      "when": ["formula field", "custom field", "roll-up summary"],
+      "also": ["platform-permission-set-generate"],
+      "why": "Creating a field often needs field access in the same turn."
+    },
+    {
+      "id": "permission-set",
+      "skill": "platform-permission-set-generate",
+      "when": ["permission set", "field-level security", "fls"],
+      "also": [],
+      "why": "Grant access. Do not create the field here."
+    },
+    {
+      "id": "validation-rule",
+      "skill": "platform-validation-rule-generate",
+      "when": ["validation rule", "error condition formula"],
+      "also": [],
+      "why": "A validation rule."
+    },
+    {
+      "id": "flow",
+      "skill": "automation-flow-generate",
+      "when": ["screen flow", "record-triggered flow", "autolaunched flow"],
+      "also": [],
+      "why": "A Flow."
+    },
+    {
+      "id": "code-analyzer",
+      "skill": "dx-code-analyzer-run",
+      "when": ["code analyzer", "pmd"],
+      "also": [],
+      "why": "A static scan."
+    },
+    {
+      "id": "unit-tests",
+      "skill": "write-unit-tests",
+      "when": ["jest", "pytest"],
+      "also": [],
+      "why": "A non-Apex unit test."
     },
     {
       "id": "review-a-change",
       "skill": "review-pull-request",
+      "when": ["pull request", "code review"],
       "also": ["write-unit-tests"],
       "why": "A review that finds a gap should be able to ask for a test in the same turn."
     },
     {
-      "id": "query-before-you-edit",
-      "skill": "query-data",
+      "id": "explain",
+      "skill": "explain-code",
+      "when": ["walk me through", "new hire"],
       "also": [],
-      "why": "Read-only queries stay on the query skill."
+      "why": "An onboarding explanation."
+    },
+    {
+      "id": "docs",
+      "skill": "draft-docs",
+      "when": ["readme"],
+      "also": [],
+      "why": "Human-facing docs."
+    },
+    {
+      "id": "sql",
+      "skill": "query-data",
+      "when": ["postgres", "sql query"],
+      "also": [],
+      "why": "A relational SQL query, not SOQL."
+    },
+    {
+      "id": "ship-a-release",
+      "skill": "ship-release",
+      "when": ["changelog", "release checklist"],
+      "also": ["draft-docs"],
+      "why": "A release note is documentation. Load the docs skill in the same turn."
+    },
+    {
+      "id": "http",
+      "skill": "http-api-guide",
+      "when": ["status code", "pagination", "idempotency"],
+      "also": [],
+      "why": "An HTTP API design question."
     }
   ]
 }

@@ -1,32 +1,233 @@
 {
-  "generated": "2026-09-30T20:55:38.179Z",
+  "generated": "2026-10-01T00:13:30.868Z",
   "skillsDir": "skills",
-  "count": 7,
+  "count": 19,
   "intents": [
     {
-      "id": "ship-a-release",
-      "skill": "ship-release",
-      "also": [
-        "draft-docs"
+      "id": "apex-test-run",
+      "skill": "platform-apex-test-run",
+      "when": [
+        "code coverage",
+        "run apex test",
+        "failing test class"
       ],
-      "why": "A release note is documentation. Load the docs skill in the same turn."
+      "also": [],
+      "why": "Running tests is not the same skill as writing them."
+    },
+    {
+      "id": "apex-test-generate",
+      "skill": "platform-apex-test-generate",
+      "when": [
+        "apex test class",
+        "apex test",
+        "bulk test"
+      ],
+      "also": [],
+      "why": "A new Apex test class."
+    },
+    {
+      "id": "apex-logs",
+      "skill": "platform-apex-logs-debug",
+      "when": [
+        "debug log",
+        "governor limit",
+        "cpu time"
+      ],
+      "also": [],
+      "why": "A log or a limit failure."
+    },
+    {
+      "id": "apex-generate",
+      "skill": "platform-apex-generate",
+      "when": [
+        "apex class",
+        "apex trigger",
+        "refactor apex"
+      ],
+      "also": [],
+      "why": "Production Apex, not tests."
+    },
+    {
+      "id": "soql",
+      "skill": "platform-soql-query",
+      "when": [
+        "soql",
+        "sosl"
+      ],
+      "also": [],
+      "why": "A Salesforce query."
+    },
+    {
+      "id": "retrieve",
+      "skill": "platform-metadata-retrieve",
+      "when": [
+        "sf project retrieve",
+        "retrieve metadata"
+      ],
+      "also": [],
+      "why": "Pull metadata from an org."
+    },
+    {
+      "id": "deploy",
+      "skill": "platform-metadata-deploy",
+      "when": [
+        "sf project deploy",
+        "deploy metadata"
+      ],
+      "also": [],
+      "why": "Push metadata to an org."
+    },
+    {
+      "id": "custom-field",
+      "skill": "platform-custom-field-generate",
+      "when": [
+        "formula field",
+        "custom field",
+        "roll-up summary"
+      ],
+      "also": [
+        "platform-permission-set-generate"
+      ],
+      "why": "Creating a field often needs field access in the same turn."
+    },
+    {
+      "id": "permission-set",
+      "skill": "platform-permission-set-generate",
+      "when": [
+        "permission set",
+        "field-level security",
+        "fls"
+      ],
+      "also": [],
+      "why": "Grant access. Do not create the field here."
+    },
+    {
+      "id": "validation-rule",
+      "skill": "platform-validation-rule-generate",
+      "when": [
+        "validation rule",
+        "error condition formula"
+      ],
+      "also": [],
+      "why": "A validation rule."
+    },
+    {
+      "id": "flow",
+      "skill": "automation-flow-generate",
+      "when": [
+        "screen flow",
+        "record-triggered flow",
+        "autolaunched flow"
+      ],
+      "also": [],
+      "why": "A Flow."
+    },
+    {
+      "id": "code-analyzer",
+      "skill": "dx-code-analyzer-run",
+      "when": [
+        "code analyzer",
+        "pmd"
+      ],
+      "also": [],
+      "why": "A static scan."
+    },
+    {
+      "id": "unit-tests",
+      "skill": "write-unit-tests",
+      "when": [
+        "jest",
+        "pytest"
+      ],
+      "also": [],
+      "why": "A non-Apex unit test."
     },
     {
       "id": "review-a-change",
       "skill": "review-pull-request",
+      "when": [
+        "pull request",
+        "code review"
+      ],
       "also": [
         "write-unit-tests"
       ],
       "why": "A review that finds a gap should be able to ask for a test in the same turn."
     },
     {
-      "id": "query-before-you-edit",
-      "skill": "query-data",
+      "id": "explain",
+      "skill": "explain-code",
+      "when": [
+        "walk me through",
+        "new hire"
+      ],
       "also": [],
-      "why": "Read-only queries stay on the query skill."
+      "why": "An onboarding explanation."
+    },
+    {
+      "id": "docs",
+      "skill": "draft-docs",
+      "when": [
+        "readme"
+      ],
+      "also": [],
+      "why": "Human-facing docs."
+    },
+    {
+      "id": "sql",
+      "skill": "query-data",
+      "when": [
+        "postgres",
+        "sql query"
+      ],
+      "also": [],
+      "why": "A relational SQL query, not SOQL."
+    },
+    {
+      "id": "ship-a-release",
+      "skill": "ship-release",
+      "when": [
+        "changelog",
+        "release checklist"
+      ],
+      "also": [
+        "draft-docs"
+      ],
+      "why": "A release note is documentation. Load the docs skill in the same turn."
+    },
+    {
+      "id": "http",
+      "skill": "http-api-guide",
+      "when": [
+        "status code",
+        "pagination",
+        "idempotency"
+      ],
+      "also": [],
+      "why": "An HTTP API design question."
     }
   ],
   "skills": [
+    {
+      "dir": "automation-flow-generate",
+      "name": "automation-flow-generate",
+      "description": "Build a Salesforce screen flow, record-triggered flow, or autolaunched flow.",
+      "oneLine": "Build a Salesforce screen flow, record-triggered flow, or autolaunched flow.",
+      "keywords": [
+        "screen flow",
+        "record-triggered flow",
+        "autolaunched flow",
+        "automation-flow-generate",
+        "build",
+        "salesforce",
+        "screen",
+        "flow",
+        "record-triggered",
+        "autolaunched"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/automation-flow-generate/SKILL.md"
+    },
     {
       "dir": "draft-docs",
       "name": "draft-docs",
@@ -44,6 +245,31 @@
       ],
       "hasKnowledge": false,
       "path": "skills/draft-docs/SKILL.md"
+    },
+    {
+      "dir": "dx-code-analyzer-run",
+      "name": "dx-code-analyzer-run",
+      "description": "Scan Apex or LWC with Salesforce Code Analyzer, including PMD security and performance rules.",
+      "oneLine": "Scan Apex or LWC with Salesforce Code Analyzer, including PMD security and performance rules.",
+      "keywords": [
+        "code analyzer",
+        "pmd",
+        "scan apex",
+        "security scan",
+        "dx-code-analyzer-run",
+        "scan",
+        "apex",
+        "lwc",
+        "salesforce",
+        "code",
+        "analyzer",
+        "including",
+        "security",
+        "performance",
+        "rules"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/dx-code-analyzer-run/SKILL.md"
     },
     {
       "dir": "explain-code",
@@ -94,22 +320,240 @@
       "path": "skills/http-api-guide/SKILL.md"
     },
     {
+      "dir": "platform-apex-generate",
+      "name": "platform-apex-generate",
+      "description": "Write or refactor an Apex class or trigger. Not for Apex tests, debug logs, or deployment.",
+      "oneLine": "Write or refactor an Apex class or trigger. Not for Apex tests, debug logs, or deployment.",
+      "keywords": [
+        "apex class",
+        "trigger",
+        "refactor apex",
+        "platform-apex-generate",
+        "write",
+        "refactor",
+        "apex",
+        "class",
+        "tests",
+        "debug",
+        "logs",
+        "deployment"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-apex-generate/SKILL.md"
+    },
+    {
+      "dir": "platform-apex-logs-debug",
+      "name": "platform-apex-logs-debug",
+      "description": "Read a Salesforce debug log or a governor-limit failure such as CPU time or heap size.",
+      "oneLine": "Read a Salesforce debug log or a governor-limit failure such as CPU time or heap size.",
+      "keywords": [
+        "debug log",
+        "governor limit",
+        "cpu time",
+        "heap",
+        "platform-apex-logs-debug",
+        "salesforce",
+        "debug",
+        "log",
+        "governor-limit",
+        "failure",
+        "such",
+        "cpu",
+        "time",
+        "size"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-apex-logs-debug/SKILL.md"
+    },
+    {
+      "dir": "platform-apex-test-generate",
+      "name": "platform-apex-test-generate",
+      "description": "Generate an Apex test class, including Test.startTest and a bulk test of 200 records.",
+      "oneLine": "Generate an Apex test class, including Test.startTest and a bulk test of 200 records.",
+      "keywords": [
+        "apex test class",
+        "test.starttest",
+        "bulk test",
+        "platform-apex-test-generate",
+        "generate",
+        "apex",
+        "test",
+        "class",
+        "including",
+        "starttest",
+        "bulk",
+        "records"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-apex-test-generate/SKILL.md"
+    },
+    {
+      "dir": "platform-apex-test-run",
+      "name": "platform-apex-test-run",
+      "description": "Run Apex tests and report code coverage. Use when a test class is failing in the org.",
+      "oneLine": "Run Apex tests and report code coverage. Use when a test class is failing in the org.",
+      "keywords": [
+        "run apex tests",
+        "code coverage",
+        "failing test class",
+        "platform-apex-test-run",
+        "apex",
+        "tests",
+        "report",
+        "code",
+        "coverage",
+        "test",
+        "class",
+        "failing",
+        "org"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-apex-test-run/SKILL.md"
+    },
+    {
+      "dir": "platform-custom-field-generate",
+      "name": "platform-custom-field-generate",
+      "description": "Create a Salesforce custom field, including a formula field or a roll-up summary.",
+      "oneLine": "Create a Salesforce custom field, including a formula field or a roll-up summary.",
+      "keywords": [
+        "custom field",
+        "formula field",
+        "roll-up summary",
+        "platform-custom-field-generate",
+        "create",
+        "salesforce",
+        "custom",
+        "field",
+        "including",
+        "formula",
+        "roll-up",
+        "summary"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-custom-field-generate/SKILL.md"
+    },
+    {
+      "dir": "platform-metadata-deploy",
+      "name": "platform-metadata-deploy",
+      "description": "Deploy metadata to a Salesforce org with sf project deploy.",
+      "oneLine": "Deploy metadata to a Salesforce org with sf project deploy.",
+      "keywords": [
+        "deploy metadata",
+        "sf project deploy",
+        "push to org",
+        "platform-metadata-deploy",
+        "deploy",
+        "metadata",
+        "salesforce",
+        "org",
+        "project"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-metadata-deploy/SKILL.md"
+    },
+    {
+      "dir": "platform-metadata-retrieve",
+      "name": "platform-metadata-retrieve",
+      "description": "Pull metadata from a Salesforce org into the project with sf project retrieve.",
+      "oneLine": "Pull metadata from a Salesforce org into the project with sf project retrieve.",
+      "keywords": [
+        "retrieve metadata",
+        "sf project retrieve",
+        "pull from org",
+        "platform-metadata-retrieve",
+        "pull",
+        "metadata",
+        "salesforce",
+        "org",
+        "project",
+        "retrieve"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-metadata-retrieve/SKILL.md"
+    },
+    {
+      "dir": "platform-permission-set-generate",
+      "name": "platform-permission-set-generate",
+      "description": "Grant object and field access in a Salesforce permission set, including field-level security.",
+      "oneLine": "Grant object and field access in a Salesforce permission set, including field-level security.",
+      "keywords": [
+        "permission set",
+        "field-level security",
+        "fls",
+        "platform-permission-set-generate",
+        "grant",
+        "object",
+        "field",
+        "access",
+        "salesforce",
+        "permission",
+        "set",
+        "including",
+        "field-level",
+        "security"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-permission-set-generate/SKILL.md"
+    },
+    {
+      "dir": "platform-soql-query",
+      "name": "platform-soql-query",
+      "description": "Write or check a SOQL or SOSL query for Salesforce records such as accounts and opportunities.",
+      "oneLine": "Write or check a SOQL or SOSL query for Salesforce records such as accounts and opportunities.",
+      "keywords": [
+        "soql",
+        "sosl",
+        "query",
+        "accounts",
+        "opportunities",
+        "platform-soql-query",
+        "write",
+        "check",
+        "salesforce",
+        "records",
+        "such"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-soql-query/SKILL.md"
+    },
+    {
+      "dir": "platform-validation-rule-generate",
+      "name": "platform-validation-rule-generate",
+      "description": "Author a Salesforce validation rule and its error condition formula.",
+      "oneLine": "Author a Salesforce validation rule and its error condition formula.",
+      "keywords": [
+        "validation rule",
+        "error condition formula",
+        "platform-validation-rule-generate",
+        "author",
+        "salesforce",
+        "validation",
+        "rule",
+        "error",
+        "condition",
+        "formula"
+      ],
+      "hasKnowledge": false,
+      "path": "skills/platform-validation-rule-generate/SKILL.md"
+    },
+    {
       "dir": "query-data",
       "name": "query-data",
-      "description": "Author and run a read-only database query. Use for SQL, SOQL, or a SELECT against orders or accounts.",
-      "oneLine": "Author and run a read-only database query. Use for SQL, SOQL, or a SELECT against orders or accounts.",
+      "description": "Author and run a read-only SQL query against a relational database, such as orders in Postgres.",
+      "oneLine": "Author and run a read-only SQL query against a relational database, such as orders in Postgres.",
       "keywords": [
         "sql",
-        "soql",
-        "select",
-        "query",
+        "postgres",
+        "relational database",
         "orders",
-        "accounts",
         "query-data",
         "author",
         "read-only",
+        "query",
+        "against",
+        "relational",
         "database",
-        "against"
+        "such"
       ],
       "hasKnowledge": false,
       "path": "skills/query-data/SKILL.md"

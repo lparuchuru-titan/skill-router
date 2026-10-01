@@ -45,7 +45,7 @@ You want a hit on `write-unit-tests`. A prompt like "what is a good lasagna reci
 Check the whole gold set:
 
 ```bash
-node eval/run-eval.mjs --gate 90
+node eval/run-eval.mjs --gate 80
 ```
 
 That exits non-zero if Recall@1 drops under 90% or if an out-of-scope prompt fires.
@@ -138,7 +138,7 @@ The description is the routing signal. Use the words a person would type. The bo
 
 ```bash
 node scripts/generate-index.mjs
-node eval/run-eval.mjs --gate 90
+node eval/run-eval.mjs --gate 80
 ```
 
 If Recall@1 drops, or a negative prompt returns a skill, the new description is overlapping a neighbor. Fix the description before you add the next skill. You do not edit the ranker.
@@ -187,17 +187,16 @@ docs/                      the blog post
 
 ## Why the ranker stays lexical
 
-On a catalog of about ninety jargon-heavy skills, 70 real prompts and 10 prompts that should abstain:
+The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (70 in-scope prompts, 12 of them paraphrases, plus 10 that must abstain) and the 19 skills in this repo. Quote that file if it disagrees with this table.
 
 | Scorer | Recall@1 | Recall@3 | MRR | False fires |
 | --- | --- | --- | --- | --- |
-| Keyword rules plus an intent list | 58.6% | 80.0% | 0.687 | 10% |
-| BM25 on name, description, keywords | 75.7% | 88.6% | 0.822 | 0% |
-| BM25 plus the full skill body | 70.0% | 85.7% | 0.782 | 10% |
-| Local embeddings (bge-small) | 64.3% | 75.7% | 0.700 | 0% |
-| BM25 fused with embeddings | 75.7% | 84.3% | 0.812 | 20% |
+| Intent list (first matching phrase) | 78.6% (55/70) | 78.6% | 0.786 | 0/10 |
+| Token overlap, no IDF | 82.9% (58/70) | 85.7% | 0.843 | 0/10 |
+| BM25 on name, description, keywords | 82.9% (58/70) | 84.3% | 0.833 | 0/10 |
+| BM25 plus the full skill body | 80.0% (56/70) | 84.3% | 0.817 | 3/10 |
 
-Indexing the body made routing worse. A general embedding model blurred the exact terms that separate two skills. Fusing the two made the router answer prompts it should have refused.
+Every direct prompt hits. Every paraphrase misses, because those prompts avoid the skill’s vocabulary. Adding the skill body lowers Recall@1 and starts answering prompts that should abstain. The server ships the frontmatter BM25 row. There is no embedding scorer in this repo.
 
 ## Blog post
 

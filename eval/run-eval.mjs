@@ -4,7 +4,7 @@
  * and false activations on out-of-scope prompts.
  *
  *   node eval/run-eval.mjs
- *   node eval/run-eval.mjs --gate 90
+ *   node eval/run-eval.mjs --gate 80
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";

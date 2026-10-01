@@ -1,0 +1,166 @@
+{
+  "generatedBy": "node eval/compare.mjs",
+  "floor": 1.5,
+  "skills": 19,
+  "prompts": {
+    "inScope": 70,
+    "outOfScope": 10,
+    "paraphrase": 12,
+    "file": "eval/prompts.jsonl"
+  },
+  "rows": [
+    {
+      "id": "intent-list",
+      "label": "Intent list (first matching phrase)",
+      "recallAt1": 78.6,
+      "recallAt1Count": 55,
+      "recallAt3": 78.6,
+      "mrr": 0.786,
+      "falseFires": 0,
+      "falseFirePct": 0,
+      "paraphraseRecallAt1": 0
+    },
+    {
+      "id": "token-overlap",
+      "label": "Token overlap, no IDF",
+      "recallAt1": 82.9,
+      "recallAt1Count": 58,
+      "recallAt3": 85.7,
+      "mrr": 0.843,
+      "falseFires": 0,
+      "falseFirePct": 0,
+      "paraphraseRecallAt1": 8.3
+    },
+    {
+      "id": "bm25",
+      "label": "BM25 on name, description, keywords",
+      "recallAt1": 82.9,
+      "recallAt1Count": 58,
+      "recallAt3": 84.3,
+      "mrr": 0.833,
+      "falseFires": 0,
+      "falseFirePct": 0,
+      "paraphraseRecallAt1": 0
+    },
+    {
+      "id": "bm25-body",
+      "label": "BM25 plus the full skill body",
+      "recallAt1": 80,
+      "recallAt1Count": 56,
+      "recallAt3": 84.3,
+      "mrr": 0.817,
+      "falseFires": 3,
+      "falseFirePct": 30,
+      "paraphraseRecallAt1": 0
+    }
+  ],
+  "production": {
+    "scorer": "bm25",
+    "recallAt1": 82.9,
+    "recallAt3": 84.3,
+    "mrr": 0.833,
+    "falseFires": 0,
+    "paraphraseRecallAt1": 0,
+    "misses": [
+      {
+        "id": "p05",
+        "type": "paraphrase",
+        "query": "Show me customers we added in the last seven days",
+        "expected": [
+          "platform-soql-query"
+        ],
+        "got": "(abstain)"
+      },
+      {
+        "id": "p10",
+        "type": "paraphrase",
+        "query": "The code that runs when a record is saved is getting hard to follow",
+        "expected": [
+          "platform-apex-generate"
+        ],
+        "got": "automation-flow-generate"
+      },
+      {
+        "id": "p15",
+        "type": "paraphrase",
+        "query": "We have no automated check that this save logic still works",
+        "expected": [
+          "platform-apex-test-generate"
+        ],
+        "got": "platform-soql-query"
+      },
+      {
+        "id": "p25",
+        "type": "paraphrase",
+        "query": "The save got halfway and then the platform killed it for being too heavy",
+        "expected": [
+          "platform-apex-logs-debug"
+        ],
+        "got": "(abstain)"
+      },
+      {
+        "id": "p30",
+        "type": "paraphrase",
+        "query": "Get the latest version of that object from the sandbox onto my laptop",
+        "expected": [
+          "platform-metadata-retrieve"
+        ],
+        "got": "ship-release"
+      },
+      {
+        "id": "p35",
+        "type": "paraphrase",
+        "query": "Send what I changed up to the sandbox",
+        "expected": [
+          "platform-metadata-deploy"
+        ],
+        "got": "platform-custom-field-generate"
+      },
+      {
+        "id": "p40",
+        "type": "paraphrase",
+        "query": "The contract needs a calculated date our reps can see on the layout",
+        "expected": [
+          "platform-custom-field-generate"
+        ],
+        "got": "(abstain)"
+      },
+      {
+        "id": "p45",
+        "type": "paraphrase",
+        "query": "Reps still cannot see the new value on the page",
+        "expected": [
+          "platform-permission-set-generate"
+        ],
+        "got": "draft-docs"
+      },
+      {
+        "id": "p50",
+        "type": "paraphrase",
+        "query": "Stop people from saving a deal when the required date is empty",
+        "expected": [
+          "platform-validation-rule-generate"
+        ],
+        "got": "(abstain)"
+      },
+      {
+        "id": "p55",
+        "type": "paraphrase",
+        "query": "Walk the rep through a short wizard before they save the order",
+        "expected": [
+          "automation-flow-generate"
+        ],
+        "got": "explain-code"
+      },
+      {
+        "id": "p60",
+        "type": "paraphrase",
+        "query": "Check the classes for the usual static-analysis problems before review",
+        "expected": [
+          "dx-code-analyzer-run"
+        ],
+        "got": "review-pull-request"
+      }
+    ]
+  }
+}

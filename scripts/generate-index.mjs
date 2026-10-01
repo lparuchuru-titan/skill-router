@@ -57,6 +57,7 @@ const index = {
   intents: (intents.rules || []).map((rule) => ({
     id: rule.id,
     skill: rule.skill,
+    when: rule.when || [],
     also: rule.also || [],
     why: rule.why || "",
   })),

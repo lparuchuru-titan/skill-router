@@ -137,7 +137,12 @@ function spacer() {
   return new Paragraph({ spacing: { before: 0, after: 120 }, children: [] });
 }
 
-const diagramsDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "diagrams");
+const docsDir = path.dirname(fileURLToPath(import.meta.url));
+const diagramsDir = path.join(docsDir, "diagrams");
+const results = JSON.parse(fs.readFileSync(path.join(docsDir, "../eval/results.json"), "utf8"));
+const scored = (id) => results.rows.find((item) => item.id === id);
+const pct = (n) => `${Number(n).toFixed(1)}%`;
+const fires = (item) => `${item.falseFires}/${results.prompts.outOfScope}`;
 
 function figure(file, alt, width, height, caption) {
   return [
@@ -337,7 +342,7 @@ const doc = new Document({
       body("The miss is not the missing skill. The miss is the prompt. A person types “add a formula field and make sure the existing permission set can see it,” and the agent either loads nothing and improvises, or loads the nearest skill and follows the wrong procedure. Ninety good playbooks in a folder do not help if the turn loads zero of them, or loads the one that creates a new permission set when the task was to edit the set you already have."),
       callout("A skill library answers “what do we know how to do?” The skill router answers “which of those does this prompt need, and which should stay on disk?”"),
       spacer(),
-      body("That second question is the whole product. I built the router while maintaining a Salesforce delivery kit of about ninety skills. The same mechanism works for any catalog. It reads the prompt, scores it against skill names and descriptions, and returns the one skill to load. If nothing clears a floor, it returns an empty list. Empty is a successful answer. A router that always picks something will eventually enforce the wrong playbook with complete confidence."),
+      body(`That second question is the whole product. The catalog measured in this repo is ${results.skills} skills. The router reads the prompt, scores it against skill names and descriptions, and returns the one skill to load. If nothing clears a floor, it returns an empty list. Empty is a successful answer. A router that always picks something will eventually enforce the wrong playbook with complete confidence.`),
 
       h1("A slice of a Salesforce skill library"),
       body("Here is a small cut of the kind of library people are already installing. These are ordinary Salesforce platform skills. Each one owns a narrow job. The descriptions are the routing signal: the words a person actually types."),
@@ -395,7 +400,7 @@ const doc = new Document({
       body("The same index is available three ways, because hosts differ. ROUTER.md is the human table. An MCP server exposes find_skill, list_skills, read_skill, search_topics, and read_topic over stdin, with no packages to install. An optional hook prints “load this skill first” only when it is sure, and prints nothing otherwise."),
 
       h1("Extending the library does not mean extending the router"),
-      body("This is the part teams underestimate. Adding skill number ninety-one should be a file, not a project. The ranker does not get a new branch. You do not retrain a model. You do not edit a priority list of phrases and hope you inserted the rule in the right place."),
+      body("This is the part teams underestimate. Adding the next skill should be a file, not a project. The ranker does not get a new branch. You do not retrain a model. You do not edit a priority list of phrases and hope you inserted the rule in the right place."),
       ...figure(
         "03-extend.png",
         "Four steps: write the skill, rebuild the index, prove the route, then use it.",
@@ -449,41 +454,39 @@ const doc = new Document({
       bullet("The keywords, twice."),
       bullet("The directory name, with hyphens read as spaces."),
       body("BM25 then does the usual thing. A term that appears in one skill and almost nowhere else is worth more than a term that appears everywhere. “Select” is cheap if half the catalog is about queries. “Idempotency” is expensive if only one skill owns it. The constants are the common ones: k1 = 1.5 and b = 0.75. Inverse document frequency is log(1 + (N − df + 0.5) / (df + 0.5)), where N is the number of skills and df is how many of them contain the term."),
-      body("There is a floor. If the top score is below it, find_skill returns an empty list. On the ninety-skill catalog that floor landed near 10, because a rare term scores higher as the catalog grows. On the seven-skill sample in the reference repo, the same idea is a floor of 1.5. Those two numbers are not interchangeable. When you add skills, sweep the floor against your gold set. Do not inherit one."),
+      body(`There is a floor. If the top score is below it, find_skill returns an empty list. Common words such as “the” and “for” are stripped before scoring, so they cannot decide a match. The floor checked into this repo is ${results.floor}, which is the value in eval/results.json. A larger catalog changes the scores. Sweep the floor against your gold set when you add skills. Do not copy a floor from a different catalog.`),
       body("A second threshold, set at 70 percent of the floor, lets a close runner-up through so you can still measure Recall@3. Anything under that line is dropped."),
 
       h1("Companions do not vote"),
-      body("The first version also had a hand-written intent list. If the prompt contained certain phrases, a named skill owned the task, and a few other skills were supposed to load beside it. It felt like the precise part of the system. Measured against a gold set, it was the part that mis-routed."),
-      body("Phrases overlap. “Validate” belongs to more than one workflow. The first matching rule won, which is a priority list pretending to be a judgment. That approach reached 58.6 percent Recall@1, and it still answered confidently on 10 percent of prompts that should have been refused."),
+      body("A hand-written intent list is still in the repo, in router/intents.json. If the prompt contains one of its phrases, that rule names a skill. The first matching phrase wins. The production router does not use those phrases to rank. eval/compare.mjs scores them so the list can be compared with BM25 on the same prompts."),
+      body(`On this gold set the intent list reaches ${pct(scored("intent-list").recallAt1)} Recall@1 (${scored("intent-list").recallAt1Count}/${results.prompts.inScope}) and ${fires(scored("intent-list"))} false fires. It is silent on prompts that do not contain its phrase, which is why every paraphrase misses. It also misses a direct prompt that describes the job without using the exact words in the rule.`),
       body("The list kept one job. After BM25 picks a winner, a companion map can say: when the release skill wins, also load the docs skill. Those names come back as load-with. They do not change who won. If you do not need companions, leave the map empty. An earlier mistake was letting the same list both rank and annotate. Ranking is BM25. Annotation happens after."),
 
       h1("The bake-off"),
-      body("I froze a gold set of 70 prompts taken from real tasks, spread across the kinds of work the catalog covered, plus 10 prompts that should abstain because they had nothing to do with any skill. Every scorer saw the same lines. The metrics were Recall@1 (the right skill is first), Recall@3 (the right skill is in the top three), mean reciprocal rank, and how often a scorer answered a prompt it should have refused."),
+      body(`The gold set is eval/prompts.jsonl in this repo: ${results.prompts.inScope} prompts that name a skill, plus ${results.prompts.outOfScope} prompts that should abstain. ${results.prompts.paraphrase} of the in-scope prompts are paraphrases. They describe the job without the skill’s vocabulary. node eval/compare.mjs scores every row on those same lines and writes eval/results.json. The table below is that file. Recall@1 means the right skill is first. Recall@3 means it is in the top three. False fires are out-of-scope prompts that still returned a skill.`),
       spacer(),
       table(
-        ["Scorer", "Recall@1", "Recall@3", "MRR", "False fire"],
-        [
-          ["Keyword rules + intent list", "58.6%", "80.0%", "0.687", "10%"],
-          ["BM25 on name, description, keywords", "75.7%", "88.6%", "0.822", "0%"],
-          ["BM25 plus the full skill body", "70.0%", "85.7%", "0.782", "10%"],
-          ["Local embeddings (bge-small)", "64.3%", "75.7%", "0.700", "0%"],
-          ["BM25 fused with embeddings", "75.7%", "84.3%", "0.812", "20%"],
-        ],
+        ["Scorer", "Recall@1", "Recall@3", "MRR", "False fires"],
+        results.rows.map((item) => [
+          item.label,
+          pct(item.recallAt1),
+          pct(item.recallAt3),
+          String(item.mrr),
+          fires(item),
+        ]),
         [4680, 1300, 1400, 1100, 1600],
       ),
       spacer(),
-      body("Four results decided the design."),
-      body("BM25 on the frontmatter won, and it refused every out-of-scope prompt in that set. That is the row that shipped."),
-      body("Adding the skill body made routing worse, down to 70 percent Recall@1, and it started firing on a negative. Skill bodies share a lot of ordinary instructional prose. There is enough of that shared language to pull the wrong skill into first place. The distinctive words already live in the description. The body belongs in read_skill, which runs after the route."),
-      body("A small local embedding model, bge-small, on the order of a hundred megabytes, landed at 64.3 percent Recall@1. Better than the old keyword rules, worse than BM25, and it costs a model the rest of the system does not need. General embeddings are trained to treat paraphrases as the same idea. In a skill catalog the difference between two skills is often one exact term: a command, a metadata type, a filename. BM25 treats that term as rare and therefore decisive. The embedding model smooths it into a neighborhood."),
-      body("Fusing BM25 with embeddings by reciprocal rank kept the same 75.7 percent Recall@1 and raised false activations to 20 percent. The fusion was more willing to answer. That is the wrong direction for a component whose job includes refusing."),
+      body(`Frontmatter BM25 is the scorer the server ships. On this run it is ${pct(scored("bm25").recallAt1)} Recall@1 (${scored("bm25").recallAt1Count}/${results.prompts.inScope}), MRR ${scored("bm25").mrr}, and ${fires(scored("bm25"))} false fires. Token overlap, which counts shared words and ignores how rare they are, ties that Recall@1 on this catalog. The two separate once the skill body is included.`),
+      body(`BM25 plus the full SKILL.md body falls to ${pct(scored("bm25-body").recallAt1)} Recall@1 and fires on ${fires(scored("bm25-body"))} out-of-scope prompts. Skill bodies share ordinary instructional prose. That prose is enough to pull the wrong skill up and to answer a prompt that should have been refused. The description already holds the distinctive words. The body belongs in read_skill, which runs after the route.`),
+      body("This repo does not ship an embedding model, so this post does not quote an embedding score. The four rows above are the comparison eval/compare.mjs can rerun from the files in the repo."),
       callout("The body of a skill is context for doing the task. It is noise for choosing the task. Index the description. Load the body only after the skill has won."),
       spacer(),
 
-      h1("What 76 percent hides"),
-      body("A later run on the live index sat in the same band, about 76 percent Recall@1. That number is not “the router understands the work.” The weak slice was paraphrase: prompts that described the job without using the skill’s vocabulary. On that slice, Recall@1 was about 31 percent, and the embedding model did not rescue it either."),
-      body("The fix is in the description. If people say “the calculator script” and the skill only says “quote plugin,” the router will miss, and it should, until their words are in the frontmatter. A description edit that helps one phrasing often steals another skill’s prompts. You will not see the theft by rereading the description. You see it when a gold prompt that used to pass starts landing on the neighbor."),
-      body("That is the whole reason the eval exists. Every skill you add, and every description you tune, comes with at least one prompt that must hit and, if the new vocabulary is broad, one prompt that must abstain. The reference repo gates the sample catalog at 90 percent Recall@1 and zero false activations. On that toy set it currently scores 100 percent across 14 in-scope prompts and refuses all 4 negatives. Do not quote the 100 percent next to the 75.7 percent. The sample skills were written so their vocabularies barely overlap. A real catalog overlaps. Trust the eval on your prompts."),
+      h1(`What the ${pct(scored("bm25").recallAt1)} hides`),
+      body(`The ${pct(scored("bm25").recallAt1)} is not “the router understands the work.” All ${results.prompts.inScope - results.prompts.paraphrase} direct prompts hit. All ${results.prompts.paraphrase} paraphrases miss, so paraphrase Recall@1 is ${pct(scored("bm25").paraphraseRecallAt1)}. Those misses are listed in eval/results.md. “Show me customers we added in the last seven days” does not say SOQL, so platform-soql-query does not win.`),
+      body("The fix is in the description. If people say “customers we added” and the skill only says “SOQL,” the router will miss, and it should, until their words are in the frontmatter. A description edit that helps one phrasing often steals another skill’s prompts. You will not see the theft by rereading the description. You see it when a gold prompt that used to pass starts landing on the neighbor."),
+      body(`That is why the eval is in the repo. Every skill you add comes with at least one prompt that must hit and, if the new vocabulary is broad, one prompt that must abstain. node eval/run-eval.mjs drives the MCP server against the same prompts. The gate in this repo is 80 percent Recall@1 and zero false fires. The last run is ${pct(scored("bm25").recallAt1)} and ${fires(scored("bm25"))}. If you change a description, rerun compare.mjs and rebuild this post from eval/results.json. The file wins if the two disagree.`),
 
       h1("Silence is part of the design"),
       body("An MCP tool is called on purpose. A hook is not. It sees every prompt, including dinner plans and laptop shopping, and it has to stay quiet on those. The hook uses the same scorer as the server, then adds one extra gate: at least one matched token has to be distinctive, meaning its inverse document frequency clears a second threshold. A prompt that only shares ordinary words with the catalog produces no output."),
@@ -498,7 +501,7 @@ const doc = new Document({
         children: [
           run("The reference implementation is "),
           linkRun("https://github.com/lparuchuru-titan/skill-router", "github.com/lparuchuru-titan/skill-router"),
-          run(". Seven sample skills, a companion map, the MCP server, the hook, and the eval. Wire the server into any MCP client:"),
+          run(`. ${results.skills} skills, a companion map, the MCP server, the hook, and the eval in eval/prompts.jsonl. Wire the server into any MCP client:`),
         ],
       }),
       ...code([
@@ -515,18 +518,19 @@ const doc = new Document({
       body("Rebuild the index after you add or edit a skill, then run the gate:"),
       ...code([
         "node scripts/generate-index.mjs",
-        "node eval/run-eval.mjs --gate 90",
+        "node eval/compare.mjs",
+        "node eval/run-eval.mjs --gate 80",
       ]),
       spacer(),
       body("Those two commands are the entire extension loop: regenerate the index, then prove the new skill did not steal a neighbor. Set SKILL_ROUTER_ROOT if the checkout is not the working directory, and SKILL_ROUTER_SKILLS_DIR if the skills live somewhere else, such as a user-level skills folder. Set SKILL_ROUTER_FLOOR when you retune."),
 
       h1("What I would leave out"),
-      body("I would leave out a vector index aimed at the last bit of paraphrase recall. The bake-off says the gain is not there, and the cost is a model, a dependency, and worse abstain behavior once you fuse the two scores."),
-      body("I would leave the intent list out of the vote. It is a good companion map and a good human index. It is a bad ranker, and we already measured that."),
+      body("I would leave an embedding model out until it is a scorer in eval/compare.mjs and beats the BM25 row on this gold set, including the false fires. This repo does not have that row."),
+      body(`I would leave the intent list out of the vote. On the same prompts it scores ${pct(scored("intent-list").recallAt1)}, below frontmatter BM25, because a prompt that skips the phrase never matches. It stays as the companion map.`),
       body("I would leave the skill body out of the index. More text at route time felt like more context. It was more ways to tie."),
 
       h1("The boring version is the one that works"),
-      body("Skill libraries are everywhere now. The useful next step is small. A generated index. A ranker that sends the prompt to one skill. A floor you retune when the catalog changes. A gold set that fails the build when a new skill steals a neighbor. The agent loads that skill and does the task it describes. The other eighty-nine stay on disk. When the prompt is not one of yours, the router gets out of the way."),
+      body("Skill libraries are everywhere now. The useful next step is small. A generated index. A ranker that sends the prompt to one skill. A floor you retune when the catalog changes. A gold set, checked in, that fails the build when a new skill steals a neighbor. The agent loads that skill and does the task it describes. The rest of the library stays on disk. When the prompt is not one of yours, the router gets out of the way."),
       spacer(),
       para([
         run("Lakshmikanth Paruchuru", { bold: true, color: NAVY }),

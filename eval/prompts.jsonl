@@ -1,18 +1,80 @@
-{"id":"t01","type":"in","query":"Write a Jest unit test for the parser","expected":["write-unit-tests"]}
-{"id":"t02","type":"in","query":"The pytest suite has a failing assertion","expected":["write-unit-tests"]}
-{"id":"t03","type":"in","query":"Please review this pull request for security issues","expected":["review-pull-request"]}
-{"id":"t04","type":"in","query":"Look at the diff before we merge","expected":["review-pull-request"]}
-{"id":"t05","type":"in","query":"Explain how the billing module works for a new hire","expected":["explain-code"]}
-{"id":"t06","type":"in","query":"Walk me through the checkout flow","expected":["explain-code"]}
-{"id":"t07","type":"in","query":"Rewrite the project README for new contributors","expected":["draft-docs"]}
-{"id":"t08","type":"in","query":"We need setup documentation in the README","expected":["draft-docs"]}
-{"id":"t09","type":"in","query":"Run a SQL query to list open orders","expected":["query-data"]}
-{"id":"t10","type":"in","query":"Write a SOQL select for accounts created this week","expected":["query-data"]}
-{"id":"t11","type":"in","query":"Prepare the release checklist and bump the version","expected":["ship-release"]}
-{"id":"t12","type":"in","query":"Draft the changelog for the release","expected":["ship-release"]}
-{"id":"t13","type":"in","query":"Which HTTP status code should a missing resource return","expected":["http-api-guide"]}
-{"id":"t14","type":"in","query":"How should pagination work on this REST API","expected":["http-api-guide"]}
+{"id":"p01","type":"direct","query":"Write a SOQL query for accounts created this week","expected":["platform-soql-query"]}
+{"id":"p02","type":"direct","query":"Check this SOSL query before I run it","expected":["platform-soql-query"]}
+{"id":"p03","type":"direct","query":"SOQL for opportunities closing this quarter","expected":["platform-soql-query"]}
+{"id":"p04","type":"direct","query":"I need a Salesforce query that lists accounts by owner","expected":["platform-soql-query"]}
+{"id":"p05","type":"paraphrase","query":"Show me customers we added in the last seven days","expected":["platform-soql-query"]}
+{"id":"p06","type":"direct","query":"Write an Apex class that rolls up invoice totals","expected":["platform-apex-generate"]}
+{"id":"p07","type":"direct","query":"Refactor this Apex trigger so it is bulk safe","expected":["platform-apex-generate"]}
+{"id":"p08","type":"direct","query":"Add an Apex trigger on Opportunity before update","expected":["platform-apex-generate"]}
+{"id":"p09","type":"direct","query":"Write an Apex class named AccountService with a new method","expected":["platform-apex-generate"]}
+{"id":"p10","type":"paraphrase","query":"The code that runs when a record is saved is getting hard to follow","expected":["platform-apex-generate"]}
+{"id":"p11","type":"direct","query":"Generate an Apex test class for AccountService","expected":["platform-apex-test-generate"]}
+{"id":"p12","type":"direct","query":"Add a bulk test of 200 records with Test.startTest","expected":["platform-apex-test-generate"]}
+{"id":"p13","type":"direct","query":"Write an Apex test class for AccountService","expected":["platform-apex-test-generate"]}
+{"id":"p14","type":"direct","query":"I need an Apex test class that inserts two hundred accounts","expected":["platform-apex-test-generate"]}
+{"id":"p15","type":"paraphrase","query":"We have no automated check that this save logic still works","expected":["platform-apex-test-generate"]}
+{"id":"p16","type":"direct","query":"Run the Apex tests and tell me the code coverage","expected":["platform-apex-test-run"]}
+{"id":"p17","type":"direct","query":"The failing test class is AccountServiceTest","expected":["platform-apex-test-run"]}
+{"id":"p18","type":"direct","query":"Run apex tests for AccountService and report code coverage","expected":["platform-apex-test-run"]}
+{"id":"p19","type":"direct","query":"What is the code coverage after the last run","expected":["platform-apex-test-run"]}
+{"id":"p20","type":"paraphrase","query":"The suite is red in the org. What failed?","expected":["platform-apex-test-run"]}
+{"id":"p21","type":"direct","query":"Read this debug log and tell me where the time went","expected":["platform-apex-logs-debug"]}
+{"id":"p22","type":"direct","query":"We hit a governor limit on CPU time","expected":["platform-apex-logs-debug"]}
+{"id":"p23","type":"direct","query":"The transaction died on heap size. Here is the debug log","expected":["platform-apex-logs-debug"]}
+{"id":"p24","type":"direct","query":"Why did this Apex transaction exceed the governor limit","expected":["platform-apex-logs-debug"]}
+{"id":"p25","type":"paraphrase","query":"The save got halfway and then the platform killed it for being too heavy","expected":["platform-apex-logs-debug"]}
+{"id":"p26","type":"direct","query":"Retrieve metadata for the Account object from the sandbox","expected":["platform-metadata-retrieve"]}
+{"id":"p27","type":"direct","query":"Run sf project retrieve for the new fields","expected":["platform-metadata-retrieve"]}
+{"id":"p28","type":"direct","query":"Retrieve metadata for the sales access settings from the org","expected":["platform-metadata-retrieve"]}
+{"id":"p29","type":"direct","query":"I need to retrieve metadata before I edit it","expected":["platform-metadata-retrieve"]}
+{"id":"p30","type":"paraphrase","query":"Get the latest version of that object from the sandbox onto my laptop","expected":["platform-metadata-retrieve"]}
+{"id":"p31","type":"direct","query":"Deploy metadata for the new field to the sandbox","expected":["platform-metadata-deploy"]}
+{"id":"p32","type":"direct","query":"Run sf project deploy for the validation rule","expected":["platform-metadata-deploy"]}
+{"id":"p33","type":"direct","query":"Deploy metadata for this change to the sandbox","expected":["platform-metadata-deploy"]}
+{"id":"p34","type":"direct","query":"Run sf project deploy for the permission set metadata","expected":["platform-metadata-deploy"]}
+{"id":"p35","type":"paraphrase","query":"Send what I changed up to the sandbox","expected":["platform-metadata-deploy"]}
+{"id":"p36","type":"direct","query":"Add a formula field for renewal date on Contract","expected":["platform-custom-field-generate"]}
+{"id":"p37","type":"direct","query":"Create a roll-up summary custom field on Account","expected":["platform-custom-field-generate"]}
+{"id":"p38","type":"direct","query":"I need a custom field to store the external id","expected":["platform-custom-field-generate"]}
+{"id":"p39","type":"direct","query":"Add a formula field that shows days until close","expected":["platform-custom-field-generate"]}
+{"id":"p40","type":"paraphrase","query":"The contract needs a calculated date our reps can see on the layout","expected":["platform-custom-field-generate"]}
+{"id":"p41","type":"direct","query":"Grant field access on the existing permission set","expected":["platform-permission-set-generate"]}
+{"id":"p42","type":"direct","query":"Update field-level security so sales can read the new field","expected":["platform-permission-set-generate"]}
+{"id":"p43","type":"direct","query":"Add FLS for RenewalDate__c on the sales permission set","expected":["platform-permission-set-generate"]}
+{"id":"p44","type":"direct","query":"The permission set is missing read access on that field","expected":["platform-permission-set-generate"]}
+{"id":"p45","type":"paraphrase","query":"Reps still cannot see the new value on the page","expected":["platform-permission-set-generate"]}
+{"id":"p46","type":"direct","query":"Author a validation rule that blocks a blank close date","expected":["platform-validation-rule-generate"]}
+{"id":"p47","type":"direct","query":"Write the error condition formula for a validation rule","expected":["platform-validation-rule-generate"]}
+{"id":"p48","type":"direct","query":"Add a validation rule on Opportunity stage","expected":["platform-validation-rule-generate"]}
+{"id":"p49","type":"direct","query":"The validation rule message should tell the user what to fix","expected":["platform-validation-rule-generate"]}
+{"id":"p50","type":"paraphrase","query":"Stop people from saving a deal when the required date is empty","expected":["platform-validation-rule-generate"]}
+{"id":"p51","type":"direct","query":"Build a screen flow that collects a shipping address","expected":["automation-flow-generate"]}
+{"id":"p52","type":"direct","query":"Create a record-triggered flow when an account is created","expected":["automation-flow-generate"]}
+{"id":"p53","type":"direct","query":"I need an autolaunched flow the Apex can call","expected":["automation-flow-generate"]}
+{"id":"p54","type":"direct","query":"Add a screen flow to the opportunity page","expected":["automation-flow-generate"]}
+{"id":"p55","type":"paraphrase","query":"Walk the rep through a short wizard before they save the order","expected":["automation-flow-generate"]}
+{"id":"p56","type":"direct","query":"Run Salesforce Code Analyzer on the Apex classes","expected":["dx-code-analyzer-run"]}
+{"id":"p57","type":"direct","query":"PMD is flagging a security issue. Show me the scan","expected":["dx-code-analyzer-run"]}
+{"id":"p58","type":"direct","query":"Scan Apex for security issues with the code analyzer","expected":["dx-code-analyzer-run"]}
+{"id":"p59","type":"direct","query":"Run a PMD performance scan on the trigger","expected":["dx-code-analyzer-run"]}
+{"id":"p60","type":"paraphrase","query":"Check the classes for the usual static-analysis problems before review","expected":["dx-code-analyzer-run"]}
+{"id":"p61","type":"direct","query":"Write a Jest unit test for the parser","expected":["write-unit-tests"]}
+{"id":"p62","type":"direct","query":"The pytest suite has a failing assertion","expected":["write-unit-tests"]}
+{"id":"p63","type":"direct","query":"Please review this pull request for security issues","expected":["review-pull-request"]}
+{"id":"p64","type":"direct","query":"Look at the diff before we merge","expected":["review-pull-request"]}
+{"id":"p65","type":"direct","query":"Explain how the billing module works for a new hire","expected":["explain-code"]}
+{"id":"p66","type":"direct","query":"Rewrite the project README for new contributors","expected":["draft-docs"]}
+{"id":"p67","type":"direct","query":"Run a SQL query against Postgres to list open orders","expected":["query-data"]}
+{"id":"p68","type":"direct","query":"Prepare the release checklist and bump the version","expected":["ship-release"]}
+{"id":"p69","type":"direct","query":"Draft the changelog for the release","expected":["ship-release"]}
+{"id":"p70","type":"direct","query":"Which HTTP status code should a missing resource return","expected":["http-api-guide"]}
 {"id":"n01","type":"out","query":"What is a good lasagna recipe","expected":[]}
 {"id":"n02","type":"out","query":"Recommend a laptop for video editing","expected":[]}
 {"id":"n03","type":"out","query":"What is the weather in Austin tomorrow","expected":[]}
 {"id":"n04","type":"out","query":"Book a flight to Denver next Friday","expected":[]}
+{"id":"n05","type":"out","query":"How do I feed a sourdough starter","expected":[]}
+{"id":"n06","type":"out","query":"Birthday gift ideas for a toddler","expected":[]}
+{"id":"n07","type":"out","query":"When does the express leave for Chicago","expected":[]}
+{"id":"n08","type":"out","query":"How do you fold a fitted sheet","expected":[]}
+{"id":"n09","type":"out","query":"Best hiking trail near the city this weekend","expected":[]}
+{"id":"n10","type":"out","query":"Translate this short poem into Spanish","expected":[]}

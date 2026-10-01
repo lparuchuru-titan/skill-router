@@ -1,7 +1,7 @@
 ---
 name: query-data
-description: Author and run a read-only database query. Use for SQL, SOQL, or a SELECT against orders or accounts.
-keywords: sql, soql, select, query, orders, accounts
+description: Author and run a read-only SQL query against a relational database, such as orders in Postgres.
+keywords: sql, postgres, relational database, orders
 ---
 
 # Query data

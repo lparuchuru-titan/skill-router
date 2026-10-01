@@ -1,7 +1,7 @@
 ---
 domain: http-api-guide
 documentCount: 3
-lastGenerated: 2026-09-30T20:55:38.179Z
+lastGenerated: 2026-10-01T00:13:30.868Z
 ---
 
 # http-api-guide — topic index
