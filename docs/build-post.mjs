@@ -328,7 +328,7 @@ const doc = new Document({
         children: [run("Load the right skill first", { size: 48, bold: true, color: NAVY })],
       }),
       para([
-        run("Everyone has a skill library now. The part that matters is which skill a prompt actually loads.", { size: 24, italics: true, color: MUTED }),
+        run("Everyone has a skill library now. The part that matters is which skills a prompt actually loads.", { size: 24, italics: true, color: MUTED }),
       ], { after: 80 }),
       para([
         run("Lakshmikanth Paruchuru", { size: 20, bold: true, color: NAVY }),
@@ -351,10 +351,12 @@ const doc = new Document({
       body("The miss is not the missing skill. The miss is the prompt. A person types “add a formula field and make sure the existing permission set can see it,” and the agent either loads nothing and improvises, or loads one nearby skill and follows only half the job. Ninety good playbooks in a folder do not help if the turn loads zero of them, or loads the field skill and never the permission-set skill the prompt also asked for."),
       callout("A skill library answers “what do we know how to do?” The skill router answers “which of those does this prompt need, and which should stay on disk?”"),
       spacer(),
-      body(`That second question is the whole product. The catalog measured in this repo is ${results.skills} skills. The router reads the prompt, compares it with skill names and descriptions, and returns the skills to load. A prompt about one job returns one skill. A prompt that asks for two jobs returns both. If the match is weak, it returns an empty list. Empty is a successful answer. A router that always picks something will eventually follow the wrong playbook with complete confidence.`),
+      body("That second question is the whole product. The router reads the prompt, compares it with skill names and descriptions, and returns the skills to load. A prompt about one job returns one skill. A prompt that asks for two jobs returns both. If the match is weak, it returns an empty list. Empty is a successful answer. A router that always picks something will eventually follow the wrong playbook with complete confidence."),
+      body("The skills checked into this repo are samples. They are here so the route can be shown and the numbers can be checked. They are not a library to adopt. Point the router at skills you have already written. Or point it at the skills folder in github.com/forcedotcom/sf-skills, the Salesforce skills library, which already has SKILL.md files for Apex, Flow, fields, permission sets, and the jobs around them. The router does not care who wrote the file. It loads the skills the prompt asked for, and it leaves the rest on disk."),
+      body(`The measurement later in this post uses those samples, ${results.skills} short files, because that is the folder in the repo. Swap the folder and the same router runs on yours.`),
 
-      h1("A slice of a Salesforce skill library"),
-      body("Here are 12 of the 19 skills in the measurement. They are short samples of those jobs, written for this repo, not the full playbooks a team would install. The other seven are general skills in the same run: unit tests, a pull-request review, an explanation, docs, a SQL query, a release, and an HTTP note. Each sample owns a narrow job. The description, and the keywords line under it, are the routing signal."),
+      h1("Samples, so the route is visible"),
+      body("The names below are the kind of Salesforce jobs a prompt has to tell apart. The files in this repo are short stand-ins, a few lines each, so this post can show the route without pasting a real playbook. The other samples in the measurement are general: unit tests, a pull-request review, an explanation, docs, a SQL query, a release, and an HTTP note. Use forcedotcom/sf-skills when you want the real versions of jobs like these, and leave these samples behind. Each sample still has the routing signal: a description, and a keywords line."),
       spacer(),
       table(
         ["Skill", "The job it owns"],
@@ -409,7 +411,8 @@ const doc = new Document({
       body("The same index is available three ways, because hosts differ. ROUTER.md is the human table. An MCP server exposes find_skill, list_skills, read_skill, search_topics, and read_topic over stdin, with no packages to install. An optional hook prints the skills to load only when it is sure, and prints nothing otherwise."),
 
       h1("Extending the library does not mean extending the router"),
-      body("This is the part teams underestimate. Adding the next skill should be a file, not a project. The ranker does not get a new branch. You do not retrain a model. You do not edit a priority list of phrases and hope you inserted the rule in the right place."),
+      body("This is the part teams underestimate. Adding the next skill should be a file, not a project. The ranker does not get a new branch. You do not retrain a model. You do not edit a priority list of phrases and hope you inserted the rule in the right place. The samples stay in the repo for the eval. Your catalog is a different folder."),
+      body("Two ways to fill that folder. Write your own SKILL.md files. Or clone the Salesforce skills library and point the router at its skills directory. Those files already have a name and a description, which is what the score reads. They do not use the keywords line this router uses when one prompt should load two skills. Add that line on the skills you want loaded together. Without it, a prompt still loads the single best match."),
       ...figure(
         "03-extend.png",
         "Four steps: write the skill, rebuild the index, prove the route, then use it.",
@@ -421,6 +424,14 @@ const doc = new Document({
       step("If a real prompt needs two skills, do not hard-wire them together. Write the prompt so it uses both job phrases, and add that prompt to the gold set. The router loads both because the prompt asked for both.", 2),
       step("Add a gold prompt that must return this skill, and a negative if the new words could fire on an unrelated prompt. If the skill is often used beside another, add one prompt that must return both, and one prompt that must return only this skill.", 2),
       step("Regenerate the index and run the eval. If the right skills stop coming back, or an unrelated prompt starts getting a skill, the new description is overlapping a neighbor. Fix that before the next skill.", 2),
+      spacer(),
+      body("To use the Salesforce skills library instead of the samples:"),
+      ...code([
+        "git clone https://github.com/forcedotcom/sf-skills.git",
+        "node scripts/generate-index.mjs --skills-dir /path/to/sf-skills/skills --out-dir .",
+      ]),
+      spacer(),
+      body("Set SKILL_ROUTER_SKILLS_DIR to that same skills folder when you start the server. Nothing from that repo is copied into this one. A folder of skills you wrote is the same command, with your path."),
       spacer(),
       body("The router code stays put. The index is generated. A new Salesforce skill — a naming-convention check, a permission-set diff, a flow-fault reviewer — shows up in find_skill on the next prompt, because its description is now in the catalog. Removing a skill is the same operation in reverse: delete the folder, regenerate, confirm the gold prompts that used to hit it now abstain or land on the replacement."),
       body("Efficiency here is operational, not clever. The expensive work is writing a sharp description and one prompt that proves it. The cheap work is everything the router does after that. I have added skills to a live catalog this way in minutes. The sessions that went wrong were the ones where I tuned a description by reading it, skipped the gold prompt, and discovered a week later that it had stolen a neighbor’s traffic."),
@@ -509,7 +520,7 @@ const doc = new Document({
         children: [
           run("The reference implementation is "),
           linkRun("https://github.com/lparuchuru-titan/skill-router", "github.com/lparuchuru-titan/skill-router"),
-          run(`. ${results.skills} skills, the MCP server, the hook, and the eval in eval/prompts.jsonl. Wire the server into any MCP client:`),
+          run(". It ships sample skills so the eval can be rerun, plus the MCP server, the hook, and eval/prompts.jsonl. Point SKILL_ROUTER_SKILLS_DIR at your own skills, or at skills/ from forcedotcom/sf-skills, and the same server loads those instead. Wire it into any MCP client:"),
         ],
       }),
       body("Replace the path with the real checkout. A relative path works only when the client starts in that directory."),

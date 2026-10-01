@@ -4,7 +4,7 @@ Point a coding agent at the skills a prompt needs before it acts. One job loads 
 
 You keep skills as `SKILL.md` files. This repo compares a prompt with their names and descriptions and returns the skills to load. If nothing is a confident match, it returns an empty list. Empty means: do not pretend a skill applied.
 
-Works with any skill catalog. The sample skills in this repo are illustrations so you can run it immediately.
+Works with any skill catalog. The files in `skills/` are samples so you can run the router immediately. Point it at skills you wrote, or at `skills/` from [forcedotcom/sf-skills](https://github.com/forcedotcom/sf-skills). The samples are not the library. The router is.
 
 ## How a prompt is routed
 
@@ -137,13 +137,14 @@ node eval/run-eval.mjs --gate 80
 
 If the exact set drops under 80 percent, or a negative prompt returns a skill, the new description is overlapping a neighbor. Fix the description before you add the next skill. You do not edit the ranker.
 
-To point the router at a skills folder you already have:
+To point the router at skills you already have, pass that folder. For the Salesforce skills library, clone it and pass its `skills` directory:
 
 ```bash
-node scripts/generate-index.mjs --skills-dir ~/.claude/skills --out-dir .
+git clone https://github.com/forcedotcom/sf-skills.git
+node scripts/generate-index.mjs --skills-dir /path/to/sf-skills/skills --out-dir .
 ```
 
-Then set `SKILL_ROUTER_SKILLS_DIR` to that same folder when you start the server. Retune `SKILL_ROUTER_FLOOR` with the eval. A floor that worked on this sample catalog will be wrong for a much larger one.
+A folder of skills you wrote is the same command with your path. Then set `SKILL_ROUTER_SKILLS_DIR` to that same folder when you start the server. Those files need a name and a description. Add a `keywords` line, comma-separated job phrases, on any skill a prompt should load beside another. Without that line, a prompt still loads the single best match. Retune `SKILL_ROUTER_FLOOR` with the eval. A floor that worked on this sample catalog will be wrong for a much larger one.
 
 ## Optional: hint before the turn starts
 
@@ -181,7 +182,7 @@ docs/                      the blog post
 
 ## Why the match stays on the name and the description
 
-The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (75 task prompts, 5 of them asking for two skills, 12 worded differently from the skill, plus 10 that must get no skill) and the 19 skills in this repo. Quote that file if it disagrees with this table. “Only the skills asked for” means the skills returned are the skills the prompt needs, with none missing and no extras. The shipped row is the one that reads the name and the one-line description. Rare words count more than common ones. The code is in `lib/score.mjs`.
+The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (75 task prompts, 5 of them asking for two skills, 12 worded differently from the skill, plus 10 that must get no skill) and the sample skills in this repo. The count is the size of that sample, not a limit on your catalog. Quote that file if it disagrees with this table. “Only the skills asked for” means the skills returned are the skills the prompt needs, with none missing and no extras. The shipped row is the one that reads the name and the one-line description. Rare words count more than common ones. The code is in `lib/score.mjs`.
 
 | How we picked | Right skill first | Only the skills asked for | Unrelated prompts answered |
 | --- | --- | --- | --- |
