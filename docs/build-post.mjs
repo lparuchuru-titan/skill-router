@@ -45,7 +45,7 @@ const cellBorders = { top: hair, bottom: hair, left: hair, right: hair };
 function run(text, opts = {}) {
   return new TextRun({
     text,
-    font: opts.font || "Calibri",
+    font: opts.font || "Arial",
     size: opts.size || 22,
     color: opts.color || INK,
     bold: !!opts.bold,
@@ -173,7 +173,7 @@ function code(lines) {
   return lines.map((line, index) => new Paragraph({
     shading: { type: ShadingType.CLEAR, fill: CODE_BG },
     spacing: { before: index === 0 ? 80 : 0, after: index === lines.length - 1 ? 80 : 0, line: 240 },
-    children: [run(line.length ? line : " ", { font: "Consolas", size: 18, color: "1A2830" })],
+    children: [run(line.length ? line : " ", { font: "Menlo", size: 18, color: "1A2830" })],
   }));
 }
 
@@ -189,7 +189,7 @@ function cell(text, width, opts = {}) {
     children: [
       new Paragraph({
         spacing: { before: 0, after: 0 },
-        children: [run(text, { size: opts.size || 18, bold: !!opts.bold, color, font: "Calibri" })],
+        children: [run(text, { size: opts.size || 18, bold: !!opts.bold, color, font: "Arial" })],
       }),
     ],
   });
@@ -218,17 +218,23 @@ function table(headers, rows, widths) {
 function linkRun(url, label) {
   return new ExternalHyperlink({
     link: url,
-    children: [new TextRun({ text: label, font: "Calibri", size: 22, style: "Hyperlink" })],
+    children: [new TextRun({ text: label, font: "Arial", size: 22, style: "Hyperlink" })],
   });
 }
 
 const doc = new Document({
+  theme: {
+    fonts: {
+      headings: "Arial",
+      body: "Arial",
+    },
+  },
   creator: "Lakshmikanth Paruchuru",
   title: "Load the Right Skill First",
   description: "A measured router for agent skill catalogs.",
   styles: {
     default: {
-      document: { run: { font: "Calibri", size: 22, color: INK } },
+      document: { run: { font: "Arial", size: 22, color: INK } },
     },
     paragraphStyles: [
       {
@@ -237,7 +243,7 @@ const doc = new Document({
         basedOn: "Normal",
         next: "Normal",
         quickFormat: true,
-        run: { font: "Calibri", size: 32, bold: true, color: NAVY },
+        run: { font: "Arial", size: 32, bold: true, color: NAVY },
         paragraph: { spacing: { before: 360, after: 140 }, outlineLevel: 0 },
       },
       {
@@ -246,7 +252,7 @@ const doc = new Document({
         basedOn: "Normal",
         next: "Normal",
         quickFormat: true,
-        run: { font: "Calibri", size: 26, bold: true, color: NAVY },
+        run: { font: "Arial", size: 26, bold: true, color: NAVY },
         paragraph: { spacing: { before: 280, after: 80 }, outlineLevel: 1 },
       },
     ],
@@ -307,9 +313,9 @@ const doc = new Document({
             children: [
               run("Load the right skill first", { size: 16, color: MUTED, italics: true }),
               run("          ", { size: 16 }),
-              new TextRun({ children: [PageNumber.CURRENT], font: "Calibri", size: 16, color: MUTED }),
+              new TextRun({ children: [PageNumber.CURRENT], font: "Arial", size: 16, color: MUTED }),
               run(" / ", { size: 16, color: MUTED }),
-              new TextRun({ children: [PageNumber.TOTAL_PAGES], font: "Calibri", size: 16, color: MUTED }),
+              new TextRun({ children: [PageNumber.TOTAL_PAGES], font: "Arial", size: 16, color: MUTED }),
             ],
           }),
         ],
