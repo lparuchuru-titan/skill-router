@@ -80,49 +80,49 @@ def canvas(w, h):
 
 
 def route_diagram():
-    image, draw = canvas(1600, 780)
-    draw.text((48, 36), "One prompt loads one skill, or none", font=font(34, True), fill=NAVY)
-    draw.text((48, 84), "The rest of the library stays on disk.", font=font(22), fill=MUTED)
+    image, draw = canvas(1600, 860)
+    draw.text((48, 36), "One prompt loads the skills the job needs", font=font(34, True), fill=NAVY)
+    draw.text((48, 84), "One job loads one skill. Two jobs load both. A weak match loads nothing.", font=font(22), fill=MUTED)
 
-    prompt = (48, 180, 430, 430)
-    router = (560, 180, 980, 430)
-    win = (1110, 150, 1552, 360)
-    quiet = (1110, 420, 1552, 630)
+    prompt = (48, 170, 460, 460)
+    router = (560, 170, 1000, 460)
+    win = (1100, 140, 1552, 400)
+    quiet = (1100, 470, 1552, 720)
 
     rounded(draw, prompt, WHITE, NAVY)
     rounded(draw, router, CREAM, GOLD)
     rounded(draw, win, GREEN_BG, GREEN)
     rounded(draw, quiet, WHITE, LINE, width=3)
 
-    text_block(draw, prompt, "Prompt", "Write a SOQL query for accounts created this week.")
-    text_block(draw, router, "Skill router", "Compare the prompt with each skill name and description. Keep a match only when it is clearly that skill.")
-    text_block(draw, win, "Load this skill", "platform-soql-query. Read its SKILL.md and follow it.", title_fill=GREEN, body_fill=INK)
+    text_block(draw, prompt, "Prompt", "Add a formula field and grant field-level security on the permission set.")
+    text_block(draw, router, "Skill router", "Compare the prompt with each skill name and description. Keep every skill the prompt actually asked for.")
+    text_block(draw, win, "Load these skills", "The field skill and the permission-set skill. Read both and follow both.", title_fill=GREEN, body_fill=INK)
     text_block(draw, quiet, "Or abstain", "Lasagna recipes, laptop shopping. Return an empty list.", title_fill=MUTED, body_fill=MUTED)
 
-    arrow(draw, 430, 305, 548, 305)
-    arrow(draw, 980, 250, 1098, 230)
-    arrow(draw, 980, 360, 1098, 500)
-    draw.text((470, 250), "compare", font=font(18, True), fill=GOLD)
-    draw.text((990, 175), "strong match", font=font(18, True), fill=GREEN)
-    draw.text((1000, 390), "weak match", font=font(18, True), fill=MUTED)
+    arrow(draw, 460, 315, 548, 315)
+    arrow(draw, 1000, 250, 1088, 250)
+    arrow(draw, 1000, 390, 1088, 560)
+    draw.text((478, 260), "compare", font=font(18, True), fill=GOLD)
+    draw.text((1006, 208), "both jobs", font=font(18, True), fill=GREEN)
+    draw.text((1004, 430), "weak match", font=font(18, True), fill=MUTED)
     image.save(OUT / "01-route.png", "PNG")
 
 
 def library_diagram():
     image, draw = canvas(1600, 860)
     draw.text((48, 36), "The library is large. The turn is not.", font=font(34, True), fill=NAVY)
-    draw.text((48, 84), "find_skill returns one winner. It does not paste the catalog into the prompt.", font=font(22), fill=MUTED)
+    draw.text((48, 84), "find_skill returns the skills this prompt needs. The rest stay on disk.", font=font(22), fill=MUTED)
 
     rounded(draw, (48, 160, 760, 800), WHITE, NAVY)
     draw.text((80, 184), "Skill library on disk", font=font(26, True), fill=NAVY)
 
     skills = [
-        ("platform-soql-query", True),
+        ("platform-custom-field-generate", True),
+        ("platform-permission-set-generate", True),
         ("platform-apex-generate", False),
         ("platform-apex-test-run", False),
         ("platform-metadata-deploy", False),
         ("platform-metadata-retrieve", False),
-        ("platform-custom-field-generate", False),
         ("automation-flow-generate", False),
         ("dx-code-analyzer-run", False),
     ]
@@ -140,11 +140,11 @@ def library_diagram():
         draw,
         (980, 280, 1552, 620),
         "This turn",
-        "Load platform-soql-query. Leave the other skills unread.",
+        "Load the field skill and the permission-set skill. Leave the other skills unread.",
         title_fill=GOLD,
     )
     arrow(draw, 760, 450, 968, 450)
-    draw.text((800, 410), "only the winner", font=font(18, True), fill=GOLD)
+    draw.text((790, 410), "only what was asked", font=font(18, True), fill=GOLD)
     image.save(OUT / "02-library.png", "PNG")
 
 

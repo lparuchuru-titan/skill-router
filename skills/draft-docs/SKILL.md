@@ -1,7 +1,7 @@
 ---
 name: draft-docs
 description: Rewrite a project README or setup documentation for new contributors.
-keywords: readme, documentation, setup, contributors
+keywords: project readme, new contributors, setup documentation
 ---
 
 # Draft docs

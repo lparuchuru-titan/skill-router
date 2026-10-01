@@ -1,7 +1,7 @@
 ---
 name: ship-release
 description: Prepare a release: version bump, changelog, and a deploy checklist.
-keywords: release, changelog, version bump, deploy checklist
+keywords: release checklist, changelog, version bump, deploy checklist
 ---
 
 # Ship a release

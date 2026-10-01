@@ -1,8 +1,8 @@
 # Skill Router
 
-Point a coding agent at **one** skill before it acts. The rest of the library stays on disk.
+Point a coding agent at the skills a prompt needs before it acts. One job loads one skill. Two jobs load both. The rest of the library stays on disk.
 
-You keep skills as `SKILL.md` files. This repo ranks a prompt against their names and descriptions and returns the skill to load. If nothing is a confident match, it returns an empty list. Empty means: do not pretend a skill applied.
+You keep skills as `SKILL.md` files. This repo compares a prompt with their names and descriptions and returns the skills to load. If nothing is a confident match, it returns an empty list. Empty means: do not pretend a skill applied.
 
 Works with any skill catalog. The sample skills in this repo are illustrations so you can run it immediately.
 
@@ -11,12 +11,12 @@ Works with any skill catalog. The sample skills in this repo are illustrations s
 ```mermaid
 flowchart LR
   P[Prompt] --> R[Skill router]
-  R -->|score clears the floor| S[Load one SKILL.md]
-  R -->|below the floor| A[Return nothing]
-  S --> C[Optional companion skills]
+  R -->|one job| S[Load that skill]
+  R -->|two jobs| M[Load both skills]
+  R -->|weak match| A[Return nothing]
 ```
 
-The ranker is a normal keyword match, weighted so a rare word counts more than a common one. The implementation is BM25, in `lib/score.mjs`. It does not read the skill body when it chooses. The body is loaded only after a skill wins, via `read_skill`.
+The match is a normal keyword match, weighted so a rare word counts more than a common one. The code is in `lib/score.mjs`. It does not read the skill body when it chooses. A skill is included when the prompt uses that skill’s job phrase, such as “formula field” or “code coverage.” The body is loaded afterward, via `read_skill`, for every skill in the set.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ cd skill-router
 node scripts/generate-index.mjs
 ```
 
-Ask the server which skill owns a task:
+Ask the server which skills a task needs:
 
 ```bash
 printf '%s\n' \
@@ -48,7 +48,7 @@ Check the whole gold set:
 node eval/run-eval.mjs --gate 80
 ```
 
-That exits non-zero if Recall@1 drops under 90% or if an out-of-scope prompt fires.
+That exits non-zero if the returned set stops matching the skills the prompt needs at least 80 percent of the time, or if an out-of-scope prompt fires.
 
 ## Use it from an agent
 
@@ -56,8 +56,7 @@ The agent should do this on a task prompt:
 
 1. Call `find_skill` with the user's words.
 2. If the list is empty, answer directly. Do not invent a skill.
-3. If there is a hit, call `read_skill` on that name and follow the file.
-4. If `loadWith` names other skills, read those in the same turn. They ride along. They did not win the ranking.
+3. Call `read_skill` on every name in the list, and follow each file. One prompt can need one skill or several. The list is the set to load, not a menu of alternatives.
 
 ### Claude Code
 
@@ -93,10 +92,10 @@ A copy of that block is in `mcp/example.mcp.json`.
 
 | Tool | When to call it | What you get back |
 | --- | --- | --- |
-| `find_skill` | First, with the user's task | Ranked skill, matched words, and companions. `[]` when the router abstains. |
-| `read_skill` | After a hit | The full `SKILL.md` to follow. |
+| `find_skill` | First, with the user's task | The skills to load. One, or several. `[]` when the router abstains. |
+| `read_skill` | Once per returned skill | The full `SKILL.md` to follow. |
 | `list_skills` | When you need the catalog | Name and one-line summary. Optional substring filter. |
-| `search_topics` | The winning skill has a notes folder | Topic hits inside that skill. |
+| `search_topics` | A loaded skill has a notes folder | Topic hits inside that skill. |
 | `read_topic` | After `search_topics` | One note. |
 
 `find_skill` arguments: `query` (required), `limit` (optional, default 5).
@@ -124,24 +123,18 @@ description: Review a database migration for locks, backfill, and rollback. Use 
 2. Do not invent a migration tool that is not in the repo.
 ```
 
-The description is the routing signal. Use the words a person would type. The body is the procedure, loaded only after this skill wins.
+The description is the routing signal. Use the words a person would type, including a short phrase that names the job (`formula field`, `code coverage`). The body is the procedure, loaded only after this skill is chosen.
 
-2. Optional: if another skill should load beside it, add a rule in `router/intents.json`. `also` is attached after a winner is chosen. It does not change who wins.
+2. Add one line to `eval/prompts.jsonl` that must return the new skill. If a real prompt needs this skill and another, add a line whose `expected` array lists both. Add an out-of-scope line too if the new words are broad (`"expected": []` means the router must abstain).
 
-```json
-{ "id": "review-migration", "skill": "review-a-migration", "also": ["write-unit-tests"], "why": "A migration review often needs a test." }
-```
-
-3. Add one line to `eval/prompts.jsonl` that must hit the new skill. Add an out-of-scope line too if the new words are broad (`"expected": []` means the router must abstain).
-
-4. Rebuild and test:
+3. Rebuild and test:
 
 ```bash
 node scripts/generate-index.mjs
 node eval/run-eval.mjs --gate 80
 ```
 
-If Recall@1 drops, or a negative prompt returns a skill, the new description is overlapping a neighbor. Fix the description before you add the next skill. You do not edit the ranker.
+If the exact set drops under 80 percent, or a negative prompt returns a skill, the new description is overlapping a neighbor. Fix the description before you add the next skill. You do not edit the ranker.
 
 To point the router at a skills folder you already have:
 
@@ -176,31 +169,31 @@ Wire it only if you want the nudge on every prompt. Calling `find_skill` from th
 
 ```
 skills/*/SKILL.md          procedures the agent loads after a hit
-router/intents.json        companion map; it does not vote
+router/intents.json        phrase list used only by the eval comparison
 router/skills-index.json   generated catalog
 ROUTER.md                  generated table of the same catalog
 mcp/server.mjs             stdio MCP server
-eval/                      gold prompts and Recall@1 / MRR
+eval/                      gold prompts; a prompt may expect one skill or several
 hooks/route-hint.mjs       optional one-line hint
 docs/                      the blog post
 ```
 
 ## Why the match stays on the name and the description
 
-The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (70 task prompts, 12 of them worded differently from the skill, plus 10 that must get no skill) and the 19 skills in this repo. Quote that file if it disagrees with this table. “BM25” in the table is the shipped matcher: rare words count more than common ones.
+The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (75 task prompts, 5 of them asking for two skills, 12 worded differently from the skill, plus 10 that must get no skill) and the 19 skills in this repo. Quote that file if it disagrees with this table. “Exact set” means the skills returned are the skills the prompt needs, with none missing and no extras. The shipped row is the one that reads the name and the one-line description. Rare words count more than common ones. The code is in `lib/score.mjs`.
 
-| Scorer | Recall@1 | Recall@3 | MRR | False fires |
-| --- | --- | --- | --- | --- |
-| Intent list (first matching phrase) | 78.6% (55/70) | 78.6% | 0.786 | 0/10 |
-| Token overlap, no IDF | 82.9% (58/70) | 85.7% | 0.843 | 0/10 |
-| BM25 on name, description, keywords | 82.9% (58/70) | 84.3% | 0.833 | 0/10 |
-| BM25 plus the full skill body | 80.0% (56/70) | 84.3% | 0.817 | 3/10 |
+| How we picked | Right skill first | Exact set | Unrelated prompts answered |
+| --- | --- | --- | --- |
+| Phrase list. First match wins. | 80% (60/75) | 73.3% (55/75) | 0/10 |
+| Count the words in common. | 84% (63/75) | 9.3% (7/75) | 0/10 |
+| Name and one-line description. This is what ships. | 84% (63/75) | 84% (63/75) | 0/10 |
+| Name, description, and the whole skill file. | 84% (63/75) | 84% (63/75) | 3/10 |
 
-Every direct prompt hits. Every paraphrase misses, because those prompts avoid the skill’s vocabulary. Adding the skill body lowers Recall@1 and starts answering prompts that should abstain. The server ships the frontmatter BM25 row. There is no embedding scorer in this repo.
+Every prompt that uses the skill’s own words hits, including all 5 prompts that ask for two skills. Every paraphrase misses, because those prompts avoid the skill’s vocabulary. Counting shared words puts the right skill first just as often here, and then returns neighboring skills the prompt did not ask for. Searching the whole skill file starts answering prompts that should get nothing. There is no embedding scorer in this repo.
 
 ## Blog post
 
-`docs/Load-the-Right-Skill-First.docx` is the external write-up: why a skill library is not enough, a Salesforce skill slice, and how the router picks one skill.
+`docs/Load-the-Right-Skill-First.docx` is the external write-up: why a skill library is not enough, a Salesforce skill slice, and how one prompt loads one skill or several.
 
 ## License
 

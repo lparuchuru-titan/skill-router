@@ -6,9 +6,10 @@ Each line:
 
 ```json
 {"id":"p01","type":"direct","query":"...","expected":["skill-dir"]}
+{"id":"p71","type":"direct","query":"...","expected":["skill-a","skill-b"]}
 ```
 
-`type` is `direct`, `paraphrase`, or `out`. An empty `expected` array means the router must abstain.
+`type` is `direct`, `paraphrase`, or `out`. `expected` lists every skill the prompt needs. One skill or several. An empty array means the router must abstain. The returned set has to match that list exactly.
 
 ```bash
 node scripts/generate-index.mjs
@@ -16,4 +17,4 @@ node eval/compare.mjs
 node eval/run-eval.mjs --gate 80
 ```
 
-`run-eval.mjs` drives the MCP server. `compare.mjs` scores the same BM25 function plus the intent-list and full-body variants. If the two disagree on the BM25 row, the server and `lib/score.mjs` have drifted.
+`run-eval.mjs` drives the MCP server and checks the exact set. `compare.mjs` scores the same matcher plus a phrase list, a word-count matcher, and a variant that also reads the skill body. If the server and `lib/score.mjs` disagree on the shipped row, they have drifted.

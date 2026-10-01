@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Build router/skills-index.json and ROUTER.md from each skill file
- * and the companion map in router/intents.json.
+ * and the notes in router/intents.json.
  *
  *   node scripts/generate-index.mjs
  *   node scripts/generate-index.mjs --skills-dir ~/my-skills --out-dir .
@@ -73,16 +73,15 @@ const lines = [
   "",
   `> ${skills.length} skills · generated ${generatedAt}`,
   "",
-  "Ranking is BM25 over each skill's name, description, and keywords. The companion list below is applied after a skill wins. It does not vote.",
+  "A prompt loads every skill whose job phrase appears in it. One job loads one skill. Two jobs load both. This file does not add skills the prompt did not ask for.",
   "",
-  "## Companions",
+  "## What each skill is for",
   "",
-  "| When this skill wins | Also load | Why |",
-  "| --- | --- | --- |",
+  "| Skill | Job |",
+  "| --- | --- |",
 ];
 for (const rule of intents.rules || []) {
-  const also = (rule.also || []).length ? rule.also.map((name) => `\`${name}\``).join(", ") : "—";
-  lines.push(`| \`${rule.skill}\` | ${also} | ${rule.why || ""} |`);
+  lines.push(`| \`${rule.skill}\` | ${rule.why || ""} |`);
 }
 lines.push("", "## Catalog", "", "| Skill | Knowledge | What it does |", "| --- | --- | --- |");
 for (const skill of skills) {

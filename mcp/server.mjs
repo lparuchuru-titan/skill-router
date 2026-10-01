@@ -3,7 +3,7 @@
  * stdio MCP server. Zero runtime dependencies.
  *
  * Tools:
- *   find_skill(query, limit?)     ranked skill, or [] when the router abstains
+ *   find_skill(query, limit?)     skills to load (one or more), or [] when the router abstains
  *   list_skills(filter?)          catalog
  *   read_skill(name)              full SKILL.md
  *   search_topics(query, domain?) keyword search over knowledge topics
@@ -12,7 +12,7 @@
  * Env:
  *   SKILL_ROUTER_ROOT         repo root (default: parent of this file's directory)
  *   SKILL_ROUTER_SKILLS_DIR   override skills directory
- *   SKILL_ROUTER_FLOOR        abstain unless top BM25 score clears this (default 1.5)
+ *   SKILL_ROUTER_FLOOR        abstain unless the best score clears this (default 1.5)
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -125,7 +125,7 @@ function readTopic(domain, topic) {
 const tools = [
   {
     name: "find_skill",
-    description: "Route a task to the skill that should be loaded first. Returns an empty list when no skill is a confident match.",
+    description: "Return every skill this prompt needs. Load all of them, not only the first. One job returns one skill. A prompt that asks for two jobs returns both. An empty list means none of the skills fit.",
     inputSchema: {
       type: "object",
       properties: {

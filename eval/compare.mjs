@@ -68,20 +68,33 @@ const scorers = [
   { id: "bm25-body", label: "BM25 plus the full skill body", rank: (query) => bm25Rank(withBodies(), query) },
 ];
 
+function sameSet(got, expected) {
+  return got.length === expected.length && expected.every((skill) => got.includes(skill));
+}
+
 function metrics(rank) {
   let recall1 = 0;
   let recall3 = 0;
   let reciprocal = 0;
+  let exact = 0;
   let paraphrase1 = 0;
   let paraphraseN = 0;
+  let multi = 0;
+  let multiExact = 0;
   const misses = [];
   for (const prompt of inScope) {
     const hits = rank(prompt.query).map((hit) => hit.skill);
     const at = hits.findIndex((skill) => prompt.expected.includes(skill));
+    const full = sameSet(hits, prompt.expected);
     if (at === 0) recall1 += 1;
     if (at >= 0 && at < 3) recall3 += 1;
     if (at >= 0) reciprocal += 1 / (at + 1);
-    else misses.push({ id: prompt.id, type: prompt.type, query: prompt.query, expected: prompt.expected, got: hits[0] || "(abstain)" });
+    if (full) exact += 1;
+    else misses.push({ id: prompt.id, type: prompt.type, query: prompt.query, expected: prompt.expected, got: hits.length ? hits.join("|") : "(abstain)" });
+    if (prompt.expected.length > 1) {
+      multi += 1;
+      if (full) multiExact += 1;
+    }
     if (prompt.type === "paraphrase") {
       paraphraseN += 1;
       if (at === 0) paraphrase1 += 1;
@@ -100,6 +113,10 @@ function metrics(rank) {
   return {
     recallAt1: round((100 * recall1) / n),
     recallAt1Count: recall1,
+    exactSet: round((100 * exact) / n),
+    exactSetCount: exact,
+    multi,
+    multiExact,
     recallAt3: round((100 * recall3) / n),
     mrr: round(reciprocal / n, 3),
     falseFires,
@@ -134,6 +151,10 @@ const results = {
     label: row.label,
     recallAt1: row.recallAt1,
     recallAt1Count: row.recallAt1Count,
+    exactSet: row.exactSet,
+    exactSetCount: row.exactSetCount,
+    multi: row.multi,
+    multiExact: row.multiExact,
     recallAt3: row.recallAt3,
     mrr: row.mrr,
     falseFires: row.falseFires,
@@ -143,6 +164,10 @@ const results = {
   production: {
     scorer: "bm25",
     recallAt1: production.recallAt1,
+    exactSet: production.exactSet,
+    exactSetCount: production.exactSetCount,
+    multi: production.multi,
+    multiExact: production.multiExact,
     recallAt3: production.recallAt3,
     mrr: production.mrr,
     falseFires: production.falseFires,
@@ -165,12 +190,18 @@ const lines = [
   `- Paraphrase prompts: ${results.prompts.paraphrase}`,
   `- BM25 abstain floor: ${results.floor}`,
   "",
-  "| Scorer | Recall@1 | Recall@3 | MRR | False fires |",
-  "| --- | --- | --- | --- | --- |",
+  "Exact set means the skills returned are the skills the prompt needs, no extras and none missing. A prompt can need one skill or several.",
+  "",
+  "| Scorer | Right skill first | Exact set | Recall@3 | MRR | False fires |",
+  "| --- | --- | --- | --- | --- | --- |",
 ];
 for (const row of results.rows) {
-  lines.push(`| ${row.label} | ${row.recallAt1}% (${row.recallAt1Count}/${results.prompts.inScope}) | ${row.recallAt3}% | ${row.mrr} | ${row.falseFires}/${results.prompts.outOfScope} |`);
+  lines.push(`| ${row.label} | ${row.recallAt1}% (${row.recallAt1Count}/${results.prompts.inScope}) | ${row.exactSet}% (${row.exactSetCount}/${results.prompts.inScope}) | ${row.recallAt3}% | ${row.mrr} | ${row.falseFires}/${results.prompts.outOfScope} |`);
 }
+lines.push(
+  "",
+  `Prompts that need more than one skill: ${production.multiExact}/${production.multi} returned the full set.`,
+);
 lines.push(
   "",
   `Paraphrase Recall@1 for production BM25: ${production.paraphraseRecallAt1}% of ${results.prompts.paraphrase}.`,

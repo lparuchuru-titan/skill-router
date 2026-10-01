@@ -3,7 +3,7 @@
   "floor": 1.5,
   "skills": 19,
   "prompts": {
-    "inScope": 70,
+    "inScope": 75,
     "outOfScope": 10,
     "paraphrase": 12,
     "file": "eval/prompts.jsonl"
@@ -12,10 +12,14 @@
     {
       "id": "intent-list",
       "label": "Intent list (first matching phrase)",
-      "recallAt1": 78.6,
-      "recallAt1Count": 55,
-      "recallAt3": 78.6,
-      "mrr": 0.786,
+      "recallAt1": 80,
+      "recallAt1Count": 60,
+      "exactSet": 73.3,
+      "exactSetCount": 55,
+      "multi": 5,
+      "multiExact": 0,
+      "recallAt3": 80,
+      "mrr": 0.8,
       "falseFires": 0,
       "falseFirePct": 0,
       "paraphraseRecallAt1": 0
@@ -23,10 +27,14 @@
     {
       "id": "token-overlap",
       "label": "Token overlap, no IDF",
-      "recallAt1": 82.9,
-      "recallAt1Count": 58,
-      "recallAt3": 85.7,
-      "mrr": 0.843,
+      "recallAt1": 84,
+      "recallAt1Count": 63,
+      "exactSet": 9.3,
+      "exactSetCount": 7,
+      "multi": 5,
+      "multiExact": 0,
+      "recallAt3": 86.7,
+      "mrr": 0.853,
       "falseFires": 0,
       "falseFirePct": 0,
       "paraphraseRecallAt1": 8.3
@@ -34,10 +42,14 @@
     {
       "id": "bm25",
       "label": "BM25 on name, description, keywords",
-      "recallAt1": 82.9,
-      "recallAt1Count": 58,
-      "recallAt3": 84.3,
-      "mrr": 0.833,
+      "recallAt1": 84,
+      "recallAt1Count": 63,
+      "exactSet": 84,
+      "exactSetCount": 63,
+      "multi": 5,
+      "multiExact": 5,
+      "recallAt3": 84,
+      "mrr": 0.84,
       "falseFires": 0,
       "falseFirePct": 0,
       "paraphraseRecallAt1": 0
@@ -45,10 +57,14 @@
     {
       "id": "bm25-body",
       "label": "BM25 plus the full skill body",
-      "recallAt1": 80,
-      "recallAt1Count": 56,
-      "recallAt3": 84.3,
-      "mrr": 0.817,
+      "recallAt1": 84,
+      "recallAt1Count": 63,
+      "exactSet": 84,
+      "exactSetCount": 63,
+      "multi": 5,
+      "multiExact": 5,
+      "recallAt3": 84,
+      "mrr": 0.84,
       "falseFires": 3,
       "falseFirePct": 30,
       "paraphraseRecallAt1": 0
@@ -56,9 +72,13 @@
   ],
   "production": {
     "scorer": "bm25",
-    "recallAt1": 82.9,
-    "recallAt3": 84.3,
-    "mrr": 0.833,
+    "recallAt1": 84,
+    "exactSet": 84,
+    "exactSetCount": 63,
+    "multi": 5,
+    "multiExact": 5,
+    "recallAt3": 84,
+    "mrr": 0.84,
     "falseFires": 0,
     "paraphraseRecallAt1": 0,
     "misses": [
@@ -88,6 +108,15 @@
           "platform-apex-test-generate"
         ],
         "got": "platform-soql-query"
+      },
+      {
+        "id": "p20",
+        "type": "paraphrase",
+        "query": "The suite is red in the org. What failed?",
+        "expected": [
+          "platform-apex-test-run"
+        ],
+        "got": "platform-metadata-deploy"
       },
       {
         "id": "p25",

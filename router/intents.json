@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Production ranking ignores `when`. BM25 scores skill frontmatter. `also` is attached after a skill wins. `when` exists so eval/compare.mjs can measure an intent-list scorer against the same prompts. Earlier rules win ties in that scorer, so specific phrases come first.",
+  "note": "The server does not use this file to choose skills. It loads every skill whose own job phrase appears in the prompt. `when` exists so eval/compare.mjs can measure a phrase list against the same prompts. Earlier rules win ties in that scorer, so specific phrases come first. `also` is unused.",
   "rules": [
     {
       "id": "apex-test-run",
@@ -55,8 +55,8 @@
       "id": "custom-field",
       "skill": "platform-custom-field-generate",
       "when": ["formula field", "custom field", "roll-up summary"],
-      "also": ["platform-permission-set-generate"],
-      "why": "Creating a field often needs field access in the same turn."
+      "also": [],
+      "why": "A field. Access is a separate skill and loads only when the prompt asks for it."
     },
     {
       "id": "permission-set",
@@ -97,8 +97,8 @@
       "id": "review-a-change",
       "skill": "review-pull-request",
       "when": ["pull request", "code review"],
-      "also": ["write-unit-tests"],
-      "why": "A review that finds a gap should be able to ask for a test in the same turn."
+      "also": [],
+      "why": "A review. A unit test loads only when the prompt also asks for one."
     },
     {
       "id": "explain",
@@ -125,8 +125,8 @@
       "id": "ship-a-release",
       "skill": "ship-release",
       "when": ["changelog", "release checklist"],
-      "also": ["draft-docs"],
-      "why": "A release note is documentation. Load the docs skill in the same turn."
+      "also": [],
+      "why": "A release. Docs load only when the prompt also asks for them."
     },
     {
       "id": "http",

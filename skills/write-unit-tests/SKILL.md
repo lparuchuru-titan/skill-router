@@ -1,7 +1,7 @@
 ---
 name: write-unit-tests
-description: Write or fix unit tests. Use for Jest, pytest, a failing assertion, coverage, or a test-data factory.
-keywords: jest, pytest, unit test, assertion, coverage
+description: Write or fix unit tests. Use for Jest, pytest, a failing assertion, or a test-data factory.
+keywords: jest, pytest, unit test, failing assertion, test-data factory
 ---
 
 # Write unit tests

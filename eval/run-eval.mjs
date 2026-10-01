@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Drive the real MCP server over stdio and report Recall@1, Recall@3, MRR,
- * and false activations on out-of-scope prompts.
+ * Drive the real MCP server over stdio.
+ * A pass means the returned skills are exactly the skills the prompt needs,
+ * and out-of-scope prompts return nothing.
  *
  *   node eval/run-eval.mjs
  *   node eval/run-eval.mjs --gate 80
@@ -71,19 +72,24 @@ function parseHits(message) {
 const inScope = prompts.filter((prompt) => prompt.expected.length > 0);
 const outScope = prompts.filter((prompt) => prompt.expected.length === 0);
 let recall1 = 0;
-let recall3 = 0;
+let exact = 0;
 let reciprocal = 0;
 let falseHits = 0;
 const misses = [];
+
+function sameSet(got, expected) {
+  return got.length === expected.length && expected.every((skill) => got.includes(skill));
+}
 
 for (const prompt of inScope) {
   const message = await rpc("tools/call", { name: "find_skill", arguments: { query: prompt.query, limit: 5 } });
   const hits = parseHits(message).map((hit) => hit.skill);
   const rank = hits.findIndex((skill) => prompt.expected.includes(skill));
+  const full = sameSet(hits, prompt.expected);
   if (rank === 0) recall1 += 1;
-  if (rank >= 0 && rank < 3) recall3 += 1;
+  if (full) exact += 1;
   if (rank >= 0) reciprocal += 1 / (rank + 1);
-  else misses.push({ id: prompt.id, query: prompt.query, expected: prompt.expected, got: hits[0] || "(abstain)" });
+  if (!full) misses.push({ id: prompt.id, query: prompt.query, expected: prompt.expected, got: hits.join("|") || "(abstain)" });
 }
 
 for (const prompt of outScope) {
@@ -100,11 +106,11 @@ child.kill();
 
 const n = inScope.length || 1;
 const r1 = (100 * recall1) / n;
-const r3 = (100 * recall3) / n;
+const exactPct = (100 * exact) / n;
 const mrr = reciprocal / n;
 console.log(`In-scope ${inScope.length} · out-of-scope ${outScope.length}`);
-console.log(`Recall@1 ${r1.toFixed(1)}% (${recall1}/${n})`);
-console.log(`Recall@3 ${r3.toFixed(1)}% (${recall3}/${n})`);
+console.log(`Right skill first ${r1.toFixed(1)}% (${recall1}/${n})`);
+console.log(`Exact set ${exactPct.toFixed(1)}% (${exact}/${n})`);
 console.log(`MRR ${mrr.toFixed(3)}`);
 console.log(`False activations ${falseHits}/${outScope.length}`);
 if (misses.length) {
@@ -112,7 +118,7 @@ if (misses.length) {
   for (const miss of misses) console.log(`  ${miss.id} expected=${miss.expected.join("|") || "(abstain)"} got=${miss.got} :: ${miss.query}`);
 }
 
-if (gate !== null && (r1 < gate || falseHits > 0)) {
-  console.error(`Gate failed (Recall@1 ${r1.toFixed(1)} < ${gate}, or a negative fired).`);
+if (gate !== null && (exactPct < gate || falseHits > 0)) {
+  console.error(`Gate failed (exact set ${exactPct.toFixed(1)} < ${gate}, or a negative fired).`);
   process.exit(1);
 }

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-01T00:13:30.868Z",
+  "generated": "2026-10-01T00:31:50.570Z",
   "skillsDir": "skills",
   "count": 19,
   "intents": [
@@ -85,10 +85,8 @@
         "custom field",
         "roll-up summary"
       ],
-      "also": [
-        "platform-permission-set-generate"
-      ],
-      "why": "Creating a field often needs field access in the same turn."
+      "also": [],
+      "why": "A field. Access is a separate skill and loads only when the prompt asks for it."
     },
     {
       "id": "permission-set",
@@ -149,10 +147,8 @@
         "pull request",
         "code review"
       ],
-      "also": [
-        "write-unit-tests"
-      ],
-      "why": "A review that finds a gap should be able to ask for a test in the same turn."
+      "also": [],
+      "why": "A review. A unit test loads only when the prompt also asks for one."
     },
     {
       "id": "explain",
@@ -190,10 +186,8 @@
         "changelog",
         "release checklist"
       ],
-      "also": [
-        "draft-docs"
-      ],
-      "why": "A release note is documentation. Load the docs skill in the same turn."
+      "also": [],
+      "why": "A release. Docs load only when the prompt also asks for them."
     },
     {
       "id": "http",
@@ -234,14 +228,17 @@
       "description": "Rewrite a project README or setup documentation for new contributors.",
       "oneLine": "Rewrite a project README or setup documentation for new contributors.",
       "keywords": [
-        "readme",
-        "documentation",
-        "setup",
-        "contributors",
+        "project readme",
+        "new contributors",
+        "setup documentation",
         "draft-docs",
         "rewrite",
         "project",
-        "new"
+        "readme",
+        "setup",
+        "documentation",
+        "new",
+        "contributors"
       ],
       "hasKnowledge": false,
       "path": "skills/draft-docs/SKILL.md"
@@ -322,8 +319,8 @@
     {
       "dir": "platform-apex-generate",
       "name": "platform-apex-generate",
-      "description": "Write or refactor an Apex class or trigger. Not for Apex tests, debug logs, or deployment.",
-      "oneLine": "Write or refactor an Apex class or trigger. Not for Apex tests, debug logs, or deployment.",
+      "description": "Write or refactor an Apex class or trigger.",
+      "oneLine": "Write or refactor an Apex class or trigger.",
       "keywords": [
         "apex class",
         "trigger",
@@ -332,11 +329,7 @@
         "write",
         "refactor",
         "apex",
-        "class",
-        "tests",
-        "debug",
-        "logs",
-        "deployment"
+        "class"
       ],
       "hasKnowledge": false,
       "path": "skills/platform-apex-generate/SKILL.md"
@@ -587,12 +580,13 @@
       "description": "Prepare a release: version bump, changelog, and a deploy checklist.",
       "oneLine": "Prepare a release: version bump, changelog, and a deploy checklist.",
       "keywords": [
-        "release",
+        "release checklist",
         "changelog",
         "version bump",
         "deploy checklist",
         "ship-release",
         "prepare",
+        "release",
         "version",
         "bump",
         "deploy",
@@ -604,20 +598,21 @@
     {
       "dir": "write-unit-tests",
       "name": "write-unit-tests",
-      "description": "Write or fix unit tests. Use for Jest, pytest, a failing assertion, coverage, or a test-data factory.",
-      "oneLine": "Write or fix unit tests. Use for Jest, pytest, a failing assertion, coverage, or a test-data factory.",
+      "description": "Write or fix unit tests. Use for Jest, pytest, a failing assertion, or a test-data factory.",
+      "oneLine": "Write or fix unit tests. Use for Jest, pytest, a failing assertion, or a test-data factory.",
       "keywords": [
         "jest",
         "pytest",
         "unit test",
-        "assertion",
-        "coverage",
+        "failing assertion",
+        "test-data factory",
         "write-unit-tests",
         "write",
         "fix",
         "unit",
         "tests",
         "failing",
+        "assertion",
         "test-data",
         "factory"
       ],

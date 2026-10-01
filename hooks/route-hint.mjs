@@ -58,20 +58,20 @@ try {
   if (!prompt) process.exit(0);
   const index = loadIndex(root);
   const corpus = buildCorpus(index.skills);
-  const hits = rankSkills(corpus, index.intents, prompt, { limit: 1, floor: abstainFloor() });
+  const hits = rankSkills(corpus, index.intents, prompt, { limit: 5, floor: abstainFloor() });
   const hit = hits[0];
   const fire = Boolean(hit && hit.rareIdf >= rareIdf);
   logDecision({
     at: new Date().toISOString(),
     decision: fire ? "fire" : "abstain",
-    skill: hit ? hit.skill : null,
+    skill: hits.map((item) => item.skill).join(","),
     score: hit ? hit.score : 0,
     prompt: prompt.slice(0, 240),
   });
   if (!fire) process.exit(0);
-  const withSkills = hit.loadWith.length ? ` Also load: ${hit.loadWith.join(", ")}.` : "";
+  const names = hits.map((item) => `\`${item.skill}\``).join(", ");
   process.stdout.write(
-    `Skill router: load \`${hit.skill}\` first (matched: ${hit.matched.join(", ")}).${withSkills}\n`
+    `Skill router: load ${names} (matched: ${hit.matched.join(", ")}).\n`
   );
 } catch {
   process.exit(0);

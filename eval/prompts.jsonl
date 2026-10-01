@@ -29,9 +29,9 @@
 {"id":"p29","type":"direct","query":"I need to retrieve metadata before I edit it","expected":["platform-metadata-retrieve"]}
 {"id":"p30","type":"paraphrase","query":"Get the latest version of that object from the sandbox onto my laptop","expected":["platform-metadata-retrieve"]}
 {"id":"p31","type":"direct","query":"Deploy metadata for the new field to the sandbox","expected":["platform-metadata-deploy"]}
-{"id":"p32","type":"direct","query":"Run sf project deploy for the validation rule","expected":["platform-metadata-deploy"]}
+{"id":"p32","type":"direct","query":"Run sf project deploy for the new metadata","expected":["platform-metadata-deploy"]}
 {"id":"p33","type":"direct","query":"Deploy metadata for this change to the sandbox","expected":["platform-metadata-deploy"]}
-{"id":"p34","type":"direct","query":"Run sf project deploy for the permission set metadata","expected":["platform-metadata-deploy"]}
+{"id":"p34","type":"direct","query":"Run sf project deploy for this change","expected":["platform-metadata-deploy"]}
 {"id":"p35","type":"paraphrase","query":"Send what I changed up to the sandbox","expected":["platform-metadata-deploy"]}
 {"id":"p36","type":"direct","query":"Add a formula field for renewal date on Contract","expected":["platform-custom-field-generate"]}
 {"id":"p37","type":"direct","query":"Create a roll-up summary custom field on Account","expected":["platform-custom-field-generate"]}
@@ -68,6 +68,11 @@
 {"id":"p68","type":"direct","query":"Prepare the release checklist and bump the version","expected":["ship-release"]}
 {"id":"p69","type":"direct","query":"Draft the changelog for the release","expected":["ship-release"]}
 {"id":"p70","type":"direct","query":"Which HTTP status code should a missing resource return","expected":["http-api-guide"]}
+{"id":"p71","type":"direct","query":"Add a formula field for renewal date and grant field-level security on the sales permission set","expected":["platform-custom-field-generate","platform-permission-set-generate"]}
+{"id":"p72","type":"direct","query":"Write an Apex class named AccountService and an Apex test class for it","expected":["platform-apex-generate","platform-apex-test-generate"]}
+{"id":"p73","type":"direct","query":"Retrieve metadata for the Account object and then deploy metadata to the sandbox","expected":["platform-metadata-retrieve","platform-metadata-deploy"]}
+{"id":"p74","type":"direct","query":"Review this pull request and write a Jest unit test for the parser","expected":["review-pull-request","write-unit-tests"]}
+{"id":"p75","type":"direct","query":"Prepare the release checklist and rewrite the docs for new contributors","expected":["ship-release","draft-docs"]}
 {"id":"n01","type":"out","query":"What is a good lasagna recipe","expected":[]}
 {"id":"n02","type":"out","query":"Recommend a laptop for video editing","expected":[]}
 {"id":"n03","type":"out","query":"What is the weather in Austin tomorrow","expected":[]}

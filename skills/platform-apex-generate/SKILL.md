@@ -1,6 +1,6 @@
 ---
 name: platform-apex-generate
-description: Write or refactor an Apex class or trigger. Not for Apex tests, debug logs, or deployment.
+description: Write or refactor an Apex class or trigger.
 keywords: apex class, trigger, refactor apex
 ---
 
