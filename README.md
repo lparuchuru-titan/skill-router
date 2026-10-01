@@ -16,7 +16,7 @@ flowchart LR
   S --> C[Optional companion skills]
 ```
 
-The ranker is BM25 over the skill name, description, and keywords. It does not read the skill body at route time. The body is loaded only after a skill wins, via `read_skill`.
+The ranker is a normal keyword match, weighted so a rare word counts more than a common one. The implementation is BM25, in `lib/score.mjs`. It does not read the skill body when it chooses. The body is loaded only after a skill wins, via `read_skill`.
 
 ## Requirements
 
@@ -185,9 +185,9 @@ hooks/route-hint.mjs       optional one-line hint
 docs/                      the blog post
 ```
 
-## Why the ranker stays lexical
+## Why the match stays on the name and the description
 
-The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (70 in-scope prompts, 12 of them paraphrases, plus 10 that must abstain) and the 19 skills in this repo. Quote that file if it disagrees with this table.
+The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (70 task prompts, 12 of them worded differently from the skill, plus 10 that must get no skill) and the 19 skills in this repo. Quote that file if it disagrees with this table. “BM25” in the table is the shipped matcher: rare words count more than common ones.
 
 | Scorer | Recall@1 | Recall@3 | MRR | False fires |
 | --- | --- | --- | --- | --- |

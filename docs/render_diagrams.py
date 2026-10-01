@@ -95,16 +95,16 @@ def route_diagram():
     rounded(draw, quiet, WHITE, LINE, width=3)
 
     text_block(draw, prompt, "Prompt", "Write a SOQL query for accounts created this week.")
-    text_block(draw, router, "Skill router", "Score names and descriptions. Keep the hit only if it clears the floor.")
+    text_block(draw, router, "Skill router", "Compare the prompt with each skill name and description. Keep a match only when it is clearly that skill.")
     text_block(draw, win, "Load this skill", "platform-soql-query. Read its SKILL.md and follow it.", title_fill=GREEN, body_fill=INK)
     text_block(draw, quiet, "Or abstain", "Lasagna recipes, laptop shopping. Return an empty list.", title_fill=MUTED, body_fill=MUTED)
 
     arrow(draw, 430, 305, 548, 305)
     arrow(draw, 980, 250, 1098, 230)
     arrow(draw, 980, 360, 1098, 500)
-    draw.text((500, 250), "score", font=font(18, True), fill=GOLD)
-    draw.text((1000, 175), "clears floor", font=font(18, True), fill=GREEN)
-    draw.text((1000, 390), "below floor", font=font(18, True), fill=MUTED)
+    draw.text((470, 250), "compare", font=font(18, True), fill=GOLD)
+    draw.text((990, 175), "strong match", font=font(18, True), fill=GREEN)
+    draw.text((1000, 390), "weak match", font=font(18, True), fill=MUTED)
     image.save(OUT / "01-route.png", "PNG")
 
 
