@@ -173,6 +173,7 @@ const results = {
     falseFires: production.falseFires,
     paraphraseRecallAt1: production.paraphraseRecallAt1,
     misses: production.misses,
+    falseList: production.falseList,
   },
 };
 
@@ -188,23 +189,31 @@ const lines = [
   `- In-scope prompts: ${results.prompts.inScope} (\`eval/prompts.jsonl\`)`,
   `- Out-of-scope prompts: ${results.prompts.outOfScope}`,
   `- Paraphrase prompts: ${results.prompts.paraphrase}`,
-  `- BM25 abstain floor: ${results.floor}`,
+  `- Abstain unless the best score clears ${results.floor}. The formula is in \`lib/score.mjs\`.`,
   "",
-  "Exact set means the skills returned are the skills the prompt needs, no extras and none missing. A prompt can need one skill or several.",
+  "“Only the skills asked for” means the skills returned are the skills the prompt needs, no extras and none missing. A prompt can need one skill or several.",
   "",
-  "| Scorer | Right skill first | Exact set | Recall@3 | MRR | False fires |",
-  "| --- | --- | --- | --- | --- | --- |",
+  "| How we picked | Right skill first | Only the skills asked for | Unrelated prompts answered |",
+  "| --- | --- | --- | --- |",
 ];
+const plainLabel = {
+  "intent-list": "Phrase list. First match wins.",
+  "token-overlap": "Count the words in common.",
+  bm25: "Name and one-line description. This is what ships.",
+  "bm25-body": "Name, description, and the whole skill file.",
+};
 for (const row of results.rows) {
-  lines.push(`| ${row.label} | ${row.recallAt1}% (${row.recallAt1Count}/${results.prompts.inScope}) | ${row.exactSet}% (${row.exactSetCount}/${results.prompts.inScope}) | ${row.recallAt3}% | ${row.mrr} | ${row.falseFires}/${results.prompts.outOfScope} |`);
+  lines.push(`| ${plainLabel[row.id] || row.label} | ${row.recallAt1}% (${row.recallAt1Count}/${results.prompts.inScope}) | ${row.exactSet}% (${row.exactSetCount}/${results.prompts.inScope}) | ${row.falseFires}/${results.prompts.outOfScope} |`);
 }
+const abstained = production.misses.filter((miss) => miss.got === "(abstain)").length;
+const wrongSkill = production.misses.length - abstained;
 lines.push(
   "",
   `Prompts that need more than one skill: ${production.multiExact}/${production.multi} returned the full set.`,
 );
 lines.push(
   "",
-  `Paraphrase Recall@1 for production BM25: ${production.paraphraseRecallAt1}% of ${results.prompts.paraphrase}.`,
+  `Reworded prompts, shipped matcher: ${production.paraphraseRecallAt1}% of ${results.prompts.paraphrase} put a needed skill first. Of the misses, ${abstained} returned nothing and ${wrongSkill} returned a different skill.`,
   "",
   "## Production misses",
   "",

@@ -92,7 +92,7 @@ A copy of that block is in `mcp/example.mcp.json`.
 
 | Tool | When to call it | What you get back |
 | --- | --- | --- |
-| `find_skill` | First, with the user's task | The skills to load. One, or several. `[]` when the router abstains. |
+| `find_skill` | First, with the user's task | The skills to load, as a list. One, or several. Read every name. `[]` when the router abstains. |
 | `read_skill` | Once per returned skill | The full `SKILL.md` to follow. |
 | `list_skills` | When you need the catalog | Name and one-line summary. Optional substring filter. |
 | `search_topics` | A loaded skill has a notes folder | Topic hits inside that skill. |
@@ -114,7 +114,8 @@ flowchart LR
 ```markdown
 ---
 name: review-a-migration
-description: Review a database migration for locks, backfill, and rollback. Use when the user says migration, backfill, or schema change.
+description: Review a database migration for locks, backfill, and rollback.
+keywords: database migration, schema change, backfill
 ---
 
 # Review a migration
@@ -123,7 +124,7 @@ description: Review a database migration for locks, backfill, and rollback. Use 
 2. Do not invent a migration tool that is not in the repo.
 ```
 
-The description is the routing signal. Use the words a person would type, including a short phrase that names the job (`formula field`, `code coverage`). The body is the procedure, loaded only after this skill is chosen.
+The description is what the score reads. The `keywords` line holds the job phrases, separated by commas. A prompt that contains one of those phrases loads this skill. If the same prompt also contains another skill’s phrase, both load. Words in the description alone do not add a second skill. The body is the procedure, loaded only after this skill is chosen.
 
 2. Add one line to `eval/prompts.jsonl` that must return the new skill. If a real prompt needs this skill and another, add a line whose `expected` array lists both. Add an out-of-scope line too if the new words are broad (`"expected": []` means the router must abstain).
 
@@ -142,7 +143,7 @@ To point the router at a skills folder you already have:
 node scripts/generate-index.mjs --skills-dir ~/.claude/skills --out-dir .
 ```
 
-Then set `SKILL_ROUTER_SKILLS_DIR` to that same folder when you start the server. Retune `SKILL_ROUTER_FLOOR` with the eval. A floor that worked for seven sample skills will be wrong for a catalog of ninety.
+Then set `SKILL_ROUTER_SKILLS_DIR` to that same folder when you start the server. Retune `SKILL_ROUTER_FLOOR` with the eval. A floor that worked on this sample catalog will be wrong for a much larger one.
 
 ## Optional: hint before the turn starts
 
@@ -180,9 +181,9 @@ docs/                      the blog post
 
 ## Why the match stays on the name and the description
 
-The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (75 task prompts, 5 of them asking for two skills, 12 worded differently from the skill, plus 10 that must get no skill) and the 19 skills in this repo. Quote that file if it disagrees with this table. “Exact set” means the skills returned are the skills the prompt needs, with none missing and no extras. The shipped row is the one that reads the name and the one-line description. Rare words count more than common ones. The code is in `lib/score.mjs`.
+The numbers live in `eval/results.md`, written by `node eval/compare.mjs` from `eval/prompts.jsonl` (75 task prompts, 5 of them asking for two skills, 12 worded differently from the skill, plus 10 that must get no skill) and the 19 skills in this repo. Quote that file if it disagrees with this table. “Only the skills asked for” means the skills returned are the skills the prompt needs, with none missing and no extras. The shipped row is the one that reads the name and the one-line description. Rare words count more than common ones. The code is in `lib/score.mjs`.
 
-| How we picked | Right skill first | Exact set | Unrelated prompts answered |
+| How we picked | Right skill first | Only the skills asked for | Unrelated prompts answered |
 | --- | --- | --- | --- |
 | Phrase list. First match wins. | 80% (60/75) | 73.3% (55/75) | 0/10 |
 | Count the words in common. | 84% (63/75) | 9.3% (7/75) | 0/10 |

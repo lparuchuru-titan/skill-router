@@ -140,6 +140,9 @@ function spacer() {
 const docsDir = path.dirname(fileURLToPath(import.meta.url));
 const diagramsDir = path.join(docsDir, "diagrams");
 const results = JSON.parse(fs.readFileSync(path.join(docsDir, "../eval/results.json"), "utf8"));
+const misses = results.production.misses || [];
+const abstained = misses.filter((item) => item.got === "(abstain)").length;
+const wrongSkill = misses.length - abstained;
 const scored = (id) => results.rows.find((item) => item.id === id);
 const pct = (n) => `${Number(n).toFixed(1)}%`;
 const fires = (item) => `${item.falseFires}/${results.prompts.outOfScope}`;
@@ -345,7 +348,7 @@ const doc = new Document({
       body(`That second question is the whole product. The catalog measured in this repo is ${results.skills} skills. The router reads the prompt, compares it with skill names and descriptions, and returns the skills to load. A prompt about one job returns one skill. A prompt that asks for two jobs returns both. If the match is weak, it returns an empty list. Empty is a successful answer. A router that always picks something will eventually follow the wrong playbook with complete confidence.`),
 
       h1("A slice of a Salesforce skill library"),
-      body("Here is a small cut of the kind of library people are already installing. These are ordinary Salesforce platform skills. Each one owns a narrow job. The descriptions are the routing signal: the words a person actually types."),
+      body("Here are 12 of the 19 skills in the measurement. They are short samples of those jobs, written for this repo, not the full playbooks a team would install. The other seven are general skills in the same run: unit tests, a pull-request review, an explanation, docs, a SQL query, a release, and an HTTP note. Each sample owns a narrow job. The description, and the keywords line under it, are the routing signal."),
       spacer(),
       table(
         ["Skill", "The job it owns"],
@@ -369,7 +372,7 @@ const doc = new Document({
       body("Twelve skills is already enough to collide. “Test” appears in three of them. “Field” appears in two. “Deploy” is a neighbor of “retrieve.” A keyword scan that stops at the first hit will send a coverage question to the skill that generates tests, and a retrieve question to the skill that deploys. The person did not ask for a bigger library. They asked for the prompt to land on the right row."),
       body("Watch a few prompts move through the router. These lines are in eval/prompts.jsonl."),
       bullet("“Write a SOQL query for accounts created this week.” That is one job. The query skill loads. The deploy skill and the Apex skill stay on disk."),
-      bullet("“Run the failing test class and tell me the coverage.” Coverage belongs to the skill that runs tests, not the one that writes a new test. One skill loads: platform-apex-test-run."),
+      bullet("“Run the Apex tests and tell me the code coverage.” Coverage belongs to the skill that runs tests, not the one that writes a new test. One skill loads: platform-apex-test-run."),
       bullet("“Add a formula field for renewal date and grant field-level security on the sales permission set.” That is two jobs. The field skill and the permission-set skill both load. A prompt that only asks for the formula field loads only the field skill. The permission-set skill does not come along unless the prompt asked for access."),
       bullet("“What is a good lasagna recipe.” Nothing in the library is about dinner. The router returns nothing, and the agent does not invent an Apex procedure."),
       body("That is the help. The library can hold dozens or hundreds of skills. The prompt pays for the skills it asked for, and no others. Context stays small, the guardrails in those skills actually run, and a prompt that is not yours does not get a random playbook stapled to it."),
@@ -408,7 +411,7 @@ const doc = new Document({
         202,
         "Figure 3. Extending the library is a file and an eval run. The router code stays put.",
       ),
-      step("Create skills/<name>/SKILL.md. Put the words a person would actually type into the description, including the short phrase that names the job. That phrase is how a prompt claims this skill. The body is the procedure, and it is loaded only after the skill is chosen.", 2),
+      step("Create skills/<name>/SKILL.md. The description is what the score reads. The keywords line holds the job phrases, separated by commas, in the words a person would type: formula field, field-level security. A prompt that contains one of those phrases loads this skill. The body is the procedure, and it is loaded only after the skill is chosen.", 2),
       step("If a real prompt needs two skills, do not hard-wire them together. Write the prompt so it uses both job phrases, and add that prompt to the gold set. The router loads both because the prompt asked for both.", 2),
       step("Add a gold prompt that must return this skill, and a negative if the new words could fire on an unrelated prompt. If the skill is often used beside another, add one prompt that must return both, and one prompt that must return only this skill.", 2),
       step("Regenerate the index and run the eval. If the right skills stop coming back, or an unrelated prompt starts getting a skill, the new description is overlapping a neighbor. Fix that before the next skill.", 2),
@@ -424,7 +427,7 @@ const doc = new Document({
       body("Putting every skill into the prompt does not fix this. The descriptions crowd each other, and the bodies blow the context window before the agent has done any work. What you want is a cheap step in front: return the skills this prompt needs, or return nothing."),
 
       h1("What gets indexed"),
-      body("A generator walks skills/ and reads each SKILL.md. It keeps the routing signal and throws away the procedure: directory name, frontmatter name, description, and a short keyword list taken from that description. It writes two artifacts from the same pass."),
+      body("A generator walks skills/ and reads each SKILL.md. It keeps the routing signal and throws away the procedure: directory name, frontmatter name, description, and the keywords line. Multi-word job phrases come from that keywords line. Single words are also taken from the description, and they affect the score only. It writes two artifacts from the same pass."),
       bullet("router/skills-index.json is the catalog the server scores against."),
       bullet("ROUTER.md is the same catalog for a person."),
       body("The body of the skill is not in the index. That choice came from a measurement, which is in the bake-off below. The procedure is loaded later, on purpose, by a separate tool, after the route has already been decided."),
@@ -449,7 +452,7 @@ const doc = new Document({
       h1("How a prompt is matched"),
       body("The router does not read every skill from top to bottom before it chooses. It reads two things: the skill’s name, and the one-line description at the top of SKILL.md. That sentence is the routing signal. The rest of the file is the procedure, and it is loaded only after the skill has been chosen."),
       body("The match itself is ordinary. Which description shares the distinctive words in the prompt? “SOQL” appears on the query skill and almost nowhere else, so a SOQL question goes there. “Test” appears on the skill that writes tests and the skill that runs them, so it is a weaker clue, and “coverage” is what separates them. Words such as “the” and “for” are ignored. They show up everywhere and do not tell you which skill the person wants."),
-      body("A skill joins the set when the prompt uses that skill’s own job phrase, the short words in its description such as “formula field” or “field-level security.” One phrase, one skill. Two phrases from two skills, both skills. If the prompt does not use any of those phrases but one skill is still clearly the best match, that one skill loads. If the best match is weak, the router returns an empty list. A question about dinner does not get an Apex skill. That cutoff is a number in the code, currently recorded in eval/results.json. You only change it by rerunning the eval after the catalog grows. You do not need the math to write a skill. You need a description that uses the words a person would actually type."),
+      body("A skill joins the set when the prompt contains that skill’s job phrase. The job phrase is a multi-word entry on the keywords line, such as “formula field” or “field-level security.” One phrase, one skill. Two phrases from two skills, both skills. Words that appear only in the description do not add a second skill. If the prompt uses none of the phrases, but one skill is still clearly the best match, that one skill loads. If the best match is weak, the router returns an empty list. A question about dinner does not get an Apex skill. That cutoff is a number in the code, currently recorded in eval/results.json. You only change it by rerunning the eval after the catalog grows. You do not need the math to write a skill. You need a keywords line that uses the words a person would actually type."),
       body("The method has a name, BM25. It is the same idea a library catalog uses: a rare word is a better clue than a common one. The formula is in lib/score.mjs for anyone who wants it. The rest of this post does not depend on it."),
 
       h1("One prompt can need more than one skill"),
@@ -458,10 +461,10 @@ const doc = new Document({
       body(`${scored("bm25").multi} prompts in the gold set ask for two skills: a formula field plus field access, an Apex class plus its test class, a retrieve plus a deploy, a review plus a unit test, and a release checklist plus docs. The shipped router returned both skills, and no extra skill, on ${scored("bm25").multiExact} of those ${scored("bm25").multi}. A prompt that names only one of those jobs returns only that skill.`),
 
       h1("What we measured"),
-      body(`The test set is eval/prompts.jsonl in this repo: ${results.prompts.inScope} prompts that should load one or more skills, plus ${results.prompts.outOfScope} prompts that should get no skill at all. ${results.prompts.paraphrase} of the real prompts say the job in different words than the skill description. ${scored("bm25").multi} prompts ask for two skills. node eval/compare.mjs runs every approach on those same lines and writes eval/results.json. The table below is that file, in plain terms. “Right skill first” means the strongest skill returned was one the prompt needed. “Unrelated prompts answered” means a dinner plan or a flight search still got a Salesforce skill. The full grid stays in eval/results.md.`),
+      body(`The test set is eval/prompts.jsonl in this repo: ${results.prompts.inScope} prompts that should load one or more skills, plus ${results.prompts.outOfScope} prompts that should get no skill at all. ${results.prompts.paraphrase} of the real prompts say the job in different words than the skill description. ${scored("bm25").multi} prompts ask for two skills. node eval/compare.mjs runs every approach on those same lines and writes eval/results.json. The table below is that file, in plain terms. “Right skill first” means the strongest skill returned was one the prompt needed. “Only the skills asked for” means the list was exactly that set, with nothing extra and nothing missing. “Unrelated prompts answered” means a dinner plan or a flight search still got a Salesforce skill. The same table is in eval/results.md.`),
       spacer(),
       table(
-        ["How we picked", "Right skill first", "Unrelated prompts answered"],
+        ["How we picked", "Right skill first", "Only the skills asked for", "Unrelated prompts answered"],
         results.rows.map((item) => [
           {
             "intent-list": "Phrase list. First match wins.",
@@ -470,9 +473,10 @@ const doc = new Document({
             "bm25-body": "Name, description, and the whole skill file.",
           }[item.id],
           `${pct(item.recallAt1)} (${item.recallAt1Count} of ${results.prompts.inScope})`,
+          `${pct(item.exactSet)} (${item.exactSetCount} of ${results.prompts.inScope})`,
           fires(item),
         ]),
-        [5200, 2680, 2200],
+        [3600, 2000, 2480, 2000],
       ),
       spacer(),
       body(`The shipped approach, matching the name and the one-line description, puts a needed skill first ${pct(scored("bm25").recallAt1)} of the time (${scored("bm25").recallAt1Count} of ${results.prompts.inScope}) and answers ${fires(scored("bm25"))} unrelated prompts. On those same ${results.prompts.inScope} prompts, the skills it returned were exactly the skills the prompt needed ${pct(scored("bm25").exactSet)} of the time (${scored("bm25").exactSetCount} of ${results.prompts.inScope}). Simply counting words in common ties the first-skill number on this small catalog, and then keeps returning neighboring skills the prompt did not ask for. The two also split when we search the body of the skill file.`),
@@ -482,7 +486,7 @@ const doc = new Document({
       spacer(),
 
       h1("The percentage is not the whole story"),
-      body(`That ${pct(scored("bm25").exactSet)} does not mean the router understands the work. All ${results.prompts.inScope - results.prompts.paraphrase} prompts that used the skills’ own words loaded exactly the skills they asked for, including the prompts that asked for two. All ${results.prompts.paraphrase} prompts that said the same job in different words were missed. Those misses are listed in eval/results.md. “Show me customers we added in the last seven days” never says SOQL, so the SOQL skill does not load.`),
+      body(`That ${pct(scored("bm25").exactSet)} does not mean the router understands the work. All ${results.prompts.inScope - results.prompts.paraphrase} prompts that used the skills’ own words loaded exactly the skills they asked for, including the prompts that asked for two. Of the ${results.prompts.paraphrase} prompts that said the same job in different words, ${abstained} returned nothing and ${wrongSkill} returned a different skill. “The suite is red in the org. What failed?” loaded the deploy skill. The list is in eval/results.md. “Show me customers we added in the last seven days” never says SOQL, so the SOQL skill does not load.`),
       body("The fix is in the description. If people say “customers we added” and the skill only says “SOQL,” the router will miss, and it should, until their words are in the frontmatter. A description edit that helps one phrasing often steals another skill’s prompts. You will not see the theft by rereading the description. You see it when a gold prompt that used to pass starts landing on the neighbor."),
       body("That is why the test prompts are in the repo. Every skill you add comes with at least one prompt that must return it and, if the new words are broad, one prompt that must come back empty. When two skills belong in the same turn, the gold set has a prompt that must return both. node eval/run-eval.mjs asks the running server the same questions. The bar in this repo is: the skills returned are exactly the skills the prompt needed at least 80 percent of the time, and none of the unrelated prompts get a skill. The last run clears that bar. If you change a description, rerun the comparison and rebuild this post from eval/results.json. If the post and the file disagree, the file wins."),
 
@@ -502,12 +506,16 @@ const doc = new Document({
           run(`. ${results.skills} skills, the MCP server, the hook, and the eval in eval/prompts.jsonl. Wire the server into any MCP client:`),
         ],
       }),
+      body("Replace the path with the real checkout. A relative path works only when the client starts in that directory."),
       ...code([
         "{",
         "  \"mcpServers\": {",
         "    \"skill-router\": {",
         "      \"command\": \"node\",",
-        "      \"args\": [\"mcp/server.mjs\"]",
+        "      \"args\": [\"/absolute/path/to/skill-router/mcp/server.mjs\"],",
+        "      \"env\": {",
+        "        \"SKILL_ROUTER_ROOT\": \"/absolute/path/to/skill-router\"",
+        "      }",
         "    }",
         "  }",
         "}",
@@ -520,7 +528,7 @@ const doc = new Document({
         "node eval/run-eval.mjs --gate 80",
       ]),
       spacer(),
-      body("Those two commands are the entire extension loop: regenerate the index, then prove the new skill did not steal a neighbor. Set SKILL_ROUTER_ROOT if the checkout is not the working directory, and SKILL_ROUTER_SKILLS_DIR if the skills live somewhere else, such as a user-level skills folder. Set SKILL_ROUTER_FLOOR when you retune."),
+      body("Those three commands are the entire extension loop: regenerate the index, write the results, then prove the new skill did not steal a neighbor. Set SKILL_ROUTER_ROOT if the checkout is not the working directory, and SKILL_ROUTER_SKILLS_DIR if the skills live somewhere else, such as a user-level skills folder. Set SKILL_ROUTER_FLOOR when you retune."),
 
       h1("What I would leave out"),
       body("I would leave a vector search out until it is one of the rows in the comparison and it beats the shipped matcher on this same prompt file, including the unrelated prompts. This repo does not have that row."),
